@@ -1,12 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+
+type SurahOption = {
+  id: number;
+  nameLatin: string;
+  meaning: string;
+};
 
 type HomeControlsProps = {
   quickQueries: string[];
   selectedSurah: string;
   selectedAyat: string;
+  surahs: SurahOption[];
 };
 
 type PanelKey = "search" | "jump" | null;
@@ -15,8 +23,65 @@ export function HomeControls({
   quickQueries,
   selectedSurah,
   selectedAyat,
+  surahs,
 }: HomeControlsProps) {
+  const router = useRouter();
   const [openPanel, setOpenPanel] = useState<PanelKey>(null);
+  const [surahQuery, setSurahQuery] = useState(selectedSurah);
+  const [ayahQuery, setAyahQuery] = useState(selectedAyat);
+
+  function normalizeValue(value: string) {
+    return value
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "");
+  }
+
+  const filteredSurahs = useMemo(() => {
+    const trimmed = surahQuery.trim();
+    if (!trimmed) {
+      return [];
+    }
+
+    const normalized = normalizeValue(trimmed);
+
+    return surahs
+      .filter((surah) => {
+        const haystacks = [
+          `${surah.id}`,
+          surah.nameLatin,
+          surah.meaning,
+        ].map(normalizeValue);
+
+        return haystacks.some((value) => value.includes(normalized));
+      })
+      .slice(0, 8);
+  }, [surahQuery, surahs]);
+
+  function handleJumpSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const directId = Number(surahQuery.trim());
+    const selectedId =
+      Number.isFinite(directId) && directId > 0
+        ? directId
+        : filteredSurahs[0]?.id;
+
+    if (!selectedId) {
+      return;
+    }
+
+    const params = new URLSearchParams();
+    params.set("surah", String(selectedId));
+
+    if (ayahQuery.trim()) {
+      params.set("ayat", ayahQuery.trim());
+    }
+
+    router.push(`/?${params.toString()}`);
+    setOpenPanel(null);
+  }
 
   function togglePanel(panel: Exclude<PanelKey, null>) {
     setOpenPanel((current) => (current === panel ? null : panel));
@@ -94,23 +159,22 @@ export function HomeControls({
 
         {openPanel === "jump" ? (
           <form
-            action="/"
+            onSubmit={handleJumpSubmit}
             className="mt-4 rounded-[1.5rem] bg-[#faf7ef] p-4 ring-1 ring-amber-100"
         >
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-amber-700">
             Lompat Cepat
           </p>
-          <div className="mt-3 grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
+          <div className="mt-3 grid gap-3 sm:grid-cols-[1.2fr_0.8fr_auto]">
             <input
-              name="surah"
-              defaultValue={selectedSurah}
-              inputMode="numeric"
-              placeholder="Nomor surat"
+              value={surahQuery}
+              onChange={(event) => setSurahQuery(event.target.value)}
+              placeholder="Nomor, nama, atau arti surat"
               className="rounded-[1rem] border border-slate-200 bg-white px-4 py-3 text-base text-slate-800 outline-none placeholder:text-slate-400"
             />
             <input
-              name="ayat"
-              defaultValue={selectedAyat}
+              value={ayahQuery}
+              onChange={(event) => setAyahQuery(event.target.value)}
               inputMode="numeric"
               placeholder="Nomor ayat"
               className="rounded-[1rem] border border-slate-200 bg-white px-4 py-3 text-base text-slate-800 outline-none placeholder:text-slate-400"
@@ -122,6 +186,36 @@ export function HomeControls({
               Lompat
             </button>
           </div>
+
+          {surahQuery.trim() ? (
+            <div className="mt-3 rounded-[1rem] bg-white/70 p-2 ring-1 ring-amber-100">
+              <div className="grid gap-2">
+                {filteredSurahs.length > 0 ? (
+                  filteredSurahs.map((surah) => (
+                    <button
+                      key={surah.id}
+                      type="button"
+                      onClick={() => setSurahQuery(surah.nameLatin)}
+                      className="flex items-center justify-between rounded-[0.9rem] px-3 py-2 text-left transition hover:bg-white"
+                    >
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-semibold text-slate-900">
+                          {surah.id}. {surah.nameLatin}
+                        </p>
+                        <p className="truncate text-xs text-slate-500">
+                          {surah.meaning}
+                        </p>
+                      </div>
+                    </button>
+                  ))
+                ) : (
+                  <p className="px-3 py-2 text-sm text-slate-500">
+                    Tidak ada surat yang cocok.
+                  </p>
+                )}
+              </div>
+            </div>
+          ) : null}
         </form>
       ) : null}
     </div>

@@ -81,6 +81,11 @@ export default async function Home({ searchParams }: HomePageProps) {
           quickQueries={quickQueries}
           selectedSurah={hasSelectedSurah ? String(selectedSurahId) : ""}
           selectedAyat={hasSelectedAyah ? String(selectedAyahNumber) : ""}
+          surahs={surahs.map((surah) => ({
+            id: surah.id,
+            nameLatin: surah.nameLatin,
+            meaning: surah.meaning,
+          }))}
         />
 
         {query ? (
