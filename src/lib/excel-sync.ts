@@ -9,6 +9,7 @@ type SurahRow = {
   arabicName: string;
   latinName: string;
   meaning: string;
+  context: string;
   verseCount: number;
 };
 
@@ -50,6 +51,10 @@ function normalizeText(value: unknown) {
   return String(value ?? "").replace(/\r?\n/g, " ").trim();
 }
 
+function normalizeMultilineText(value: unknown) {
+  return String(value ?? "").replace(/\r\n/g, "\n").trim();
+}
+
 function normalizeInteger(value: unknown) {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : 0;
@@ -75,6 +80,7 @@ function parseSurahs(workbook: XLSX.WorkBook) {
       arabicName: normalizeText(row[1]),
       latinName: normalizeText(row[2]),
       meaning: normalizeText(row[3]),
+      context: normalizeMultilineText(row[6]),
       verseCount: normalizeInteger(row[4]),
     }))
     .filter((row) => row.id > 0);
@@ -112,20 +118,22 @@ function parseVerses(workbook: XLSX.WorkBook) {
 async function upsertSurahs(client: PoolClient, surahs: SurahRow[]) {
   await client.query(
     `
-      INSERT INTO surahs (id, name_arabic, name_latin, meaning, verse_count)
+      INSERT INTO surahs (id, name_arabic, name_latin, meaning, context, verse_count)
       SELECT *
       FROM UNNEST(
         $1::int[],
         $2::text[],
         $3::text[],
         $4::text[],
-        $5::int[]
+        $5::text[],
+        $6::int[]
       )
       ON CONFLICT (id)
       DO UPDATE SET
         name_arabic = EXCLUDED.name_arabic,
         name_latin = EXCLUDED.name_latin,
         meaning = EXCLUDED.meaning,
+        context = EXCLUDED.context,
         verse_count = EXCLUDED.verse_count,
         updated_at = NOW()
     `,
@@ -134,6 +142,7 @@ async function upsertSurahs(client: PoolClient, surahs: SurahRow[]) {
       surahs.map((surah) => surah.arabicName),
       surahs.map((surah) => surah.latinName),
       surahs.map((surah) => surah.meaning),
+      surahs.map((surah) => surah.context),
       surahs.map((surah) => surah.verseCount),
     ],
   );

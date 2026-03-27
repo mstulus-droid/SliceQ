@@ -76,7 +76,7 @@ export default async function VerseDetailPage({ params }: PageProps) {
             </div>
             <div className="flex items-center justify-center gap-2">
               <Link
-                href={`/surat/${verse.surahId}`}
+                href={`/surat/${verse.surahId}#ayat-${verse.ayahNumber}`}
                 aria-label="Kembali ke surat utuhnya"
                 title="Kembali ke surat utuhnya"
                 className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/15 text-white transition hover:bg-white/10"

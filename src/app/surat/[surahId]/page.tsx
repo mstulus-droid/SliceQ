@@ -3,12 +3,16 @@ import { notFound } from "next/navigation";
 import { DatabaseUnavailable } from "@/app/database-unavailable";
 import { getDatabaseErrorInfo } from "@/lib/db";
 import {
+  type SurahListItem,
   type VerseRecord,
+  getSurahs,
   getSurahById,
   getVersesBySurahId,
 } from "@/lib/quran-data";
 import { SurahFloatingControls } from "./surah-floating-controls";
 import { SurahJumpControl } from "./surah-jump-control";
+import { SurahSearchControl } from "./surah-search-control";
+import { SurahStickyTitle } from "./surah-sticky-title";
 import { VerseAnalysisDisclosures } from "./verse-analysis-disclosures";
 
 type PageProps = {
@@ -75,9 +79,10 @@ export default async function SurahDetailPage({ params }: PageProps) {
   const { surahId } = await params;
   const parsedId = Number(surahId);
   let surah;
+  let surahs: SurahListItem[];
 
   try {
-    surah = await getSurahById(parsedId);
+    [surah, surahs] = await Promise.all([getSurahById(parsedId), getSurahs()]);
   } catch (error) {
     return <DatabaseUnavailable {...getDatabaseErrorInfo(error)} />;
   }
@@ -99,9 +104,20 @@ export default async function SurahDetailPage({ params }: PageProps) {
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,#eef6ef_0%,#f8f4ea_100%)] px-5 py-8 sm:px-8 lg:px-12">
       <div className="mx-auto flex max-w-6xl flex-col gap-5">
-        <SurahFloatingControls verseCount={surah.verseCount} />
+        <SurahStickyTitle title={surah.nameLatin} />
+        <SurahFloatingControls
+          verseCount={surah.verseCount}
+          surahs={surahs.map((item) => ({
+            id: item.id,
+            nameLatin: item.nameLatin,
+            meaning: item.meaning,
+          }))}
+        />
         <section className="space-y-4">
-          <div className="rounded-[2rem] bg-[radial-gradient(circle_at_top_right,#17412f,transparent_35%),linear-gradient(180deg,#0f172a_0%,#16212f_100%)] p-6 text-center text-white shadow-[0_30px_80px_-35px_rgba(15,23,42,0.7)] sm:p-8">
+          <div
+            id="surah-header"
+            className="relative z-30 rounded-[2rem] bg-[radial-gradient(circle_at_top_right,#17412f,transparent_35%),linear-gradient(180deg,#0f172a_0%,#16212f_100%)] p-6 text-center text-white shadow-[0_30px_80px_-35px_rgba(15,23,42,0.7)] sm:p-8"
+          >
             <p className="text-sm font-semibold uppercase tracking-[0.25em] text-emerald-300">
               Surat {surah.id}
             </p>
@@ -114,8 +130,21 @@ export default async function SurahDetailPage({ params }: PageProps) {
             <p className="mt-4 text-sm leading-7 text-slate-300 sm:text-base">
               {surah.meaning}, terdiri dari {surah.verseCount} ayat dan turun di {surah.revelationPlace}.
             </p>
+            {surah.context ? (
+              <p className="mt-4 whitespace-pre-line rounded-[1.25rem] border border-white/10 bg-white/8 px-4 py-3 text-left text-sm leading-7 text-slate-200">
+                {surah.context}
+              </p>
+            ) : null}
 
             <div className="mt-6 flex items-center justify-center gap-3">
+              <SurahSearchControl
+                surahs={surahs.map((item) => ({
+                  id: item.id,
+                  nameLatin: item.nameLatin,
+                  meaning: item.meaning,
+                }))}
+                className="min-w-[10.5rem] justify-center"
+              />
               <Link
                 href="/"
                 aria-label="Kembali ke home"
@@ -127,7 +156,10 @@ export default async function SurahDetailPage({ params }: PageProps) {
                   <path d="M6.5 10.5V19h11v-8.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </Link>
-              <SurahJumpControl verseCount={surah.verseCount} />
+              <SurahJumpControl
+                verseCount={surah.verseCount}
+                className="min-w-[10.5rem] justify-center"
+              />
             </div>
           </div>
 
@@ -147,7 +179,7 @@ export default async function SurahDetailPage({ params }: PageProps) {
                   <>
                     <div className="absolute bottom-8 left-2 top-14 w-px bg-emerald-200 sm:left-3" />
                     <div className="absolute bottom-8 left-2 h-px w-4 bg-emerald-200 sm:left-3 sm:w-5" />
-                    <div className="sticky top-3 z-20 mb-3 rounded-[1.25rem] border border-emerald-200/80 bg-emerald-50/92 px-4 py-3 text-sm font-semibold leading-7 text-emerald-950 shadow-[0_12px_34px_-28px_rgba(6,78,59,0.5)] backdrop-blur">
+                    <div className="sticky top-12 z-20 mb-3 rounded-[1.25rem] border border-emerald-200/80 bg-emerald-50/92 px-4 py-3 text-sm font-semibold leading-7 text-emerald-950 shadow-[0_12px_34px_-28px_rgba(6,78,59,0.5)] backdrop-blur sm:top-14">
                       {group.topic}
                     </div>
                   </>
@@ -158,7 +190,7 @@ export default async function SurahDetailPage({ params }: PageProps) {
                     <article
                       key={`${verse.surahId}-${verse.ayahNumber}`}
                       id={`ayat-${verse.ayahNumber}`}
-                      className="rounded-[2rem] bg-white p-6 shadow-[0_20px_60px_-35px_rgba(15,23,42,0.35)]"
+                      className="scroll-mt-28 rounded-[2rem] bg-white p-6 shadow-[0_20px_60px_-35px_rgba(15,23,42,0.35)]"
                     >
                       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:gap-4">
                         <p className="text-sm font-bold uppercase tracking-[0.18em] text-emerald-900">

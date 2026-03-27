@@ -5,6 +5,7 @@ export type SurahListItem = {
   nameArabic: string;
   nameLatin: string;
   meaning: string;
+  context: string;
   verseCount: number;
   revelationPlace: string;
 };
@@ -62,6 +63,7 @@ function mapSurah(row: {
   name_arabic: string;
   name_latin: string;
   meaning: string;
+  context: string;
   verse_count: number;
   revelation_place: string | null;
 }): SurahListItem {
@@ -70,6 +72,7 @@ function mapSurah(row: {
     nameArabic: row.name_arabic,
     nameLatin: row.name_latin,
     meaning: row.meaning,
+    context: row.context,
     verseCount: row.verse_count,
     revelationPlace: row.revelation_place ?? "Tidak diketahui",
   };
@@ -142,6 +145,7 @@ export async function getSurahs(limit?: number): Promise<SurahListItem[]> {
     name_arabic: string;
     name_latin: string;
     meaning: string;
+    context: string;
     verse_count: number;
     revelation_place: string | null;
   }>(
@@ -151,6 +155,7 @@ export async function getSurahs(limit?: number): Promise<SurahListItem[]> {
         s.name_arabic,
         s.name_latin,
         s.meaning,
+        s.context,
         s.verse_count,
         coalesce(mode() within group (order by v.revelation_place), 'Tidak diketahui') as revelation_place
       from surahs s
@@ -172,6 +177,7 @@ export async function getSurahById(id: number): Promise<SurahListItem | null> {
     name_arabic: string;
     name_latin: string;
     meaning: string;
+    context: string;
     verse_count: number;
     revelation_place: string | null;
   }>(
@@ -181,6 +187,7 @@ export async function getSurahById(id: number): Promise<SurahListItem | null> {
         s.name_arabic,
         s.name_latin,
         s.meaning,
+        s.context,
         s.verse_count,
         coalesce(mode() within group (order by v.revelation_place), 'Tidak diketahui') as revelation_place
       from surahs s

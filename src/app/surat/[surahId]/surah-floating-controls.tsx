@@ -3,16 +3,22 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { SurahJumpControl } from "./surah-jump-control";
+import { SurahSearchControl } from "./surah-search-control";
 
 type SurahFloatingControlsProps = {
   verseCount: number;
+  surahs: {
+    id: number;
+    nameLatin: string;
+    meaning: string;
+  }[];
 };
 
-const SHOW_AFTER_SCROLL_Y = 180;
-const DIRECTION_DELTA = 8;
+const SHOW_AFTER_SCROLL_Y = 120;
 
 export function SurahFloatingControls({
   verseCount,
+  surahs,
 }: SurahFloatingControlsProps) {
   const [isVisible, setIsVisible] = useState(false);
   const lastScrollY = useRef(0);
@@ -20,13 +26,12 @@ export function SurahFloatingControls({
   useEffect(() => {
     function updateVisibility() {
       const currentScrollY = window.scrollY;
-      const difference = currentScrollY - lastScrollY.current;
 
       if (currentScrollY <= SHOW_AFTER_SCROLL_Y) {
         setIsVisible(false);
-      } else if (difference <= -DIRECTION_DELTA) {
+      } else if (currentScrollY < lastScrollY.current) {
         setIsVisible(true);
-      } else if (difference >= DIRECTION_DELTA) {
+      } else if (currentScrollY > lastScrollY.current) {
         setIsVisible(false);
       }
 
@@ -50,7 +55,12 @@ export function SurahFloatingControls({
       }`}
       aria-hidden={!isVisible}
     >
-      <div className="pointer-events-auto flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/95 p-2 shadow-[0_18px_50px_-28px_rgba(15,23,42,0.45)] backdrop-blur">
+      <div className="pointer-events-auto grid min-w-[min(100%,28rem)] grid-cols-[minmax(0,1fr)_44px_minmax(0,1fr)] items-center gap-2 rounded-full border border-slate-200/80 bg-white/95 p-2 shadow-[0_18px_50px_-28px_rgba(15,23,42,0.45)] backdrop-blur">
+        <SurahSearchControl
+          surahs={surahs}
+          className="w-full justify-center"
+          menuPosition="top"
+        />
         <Link
           href="/"
           aria-label="Kembali ke home"
@@ -76,7 +86,8 @@ export function SurahFloatingControls({
         <SurahJumpControl
           verseCount={verseCount}
           label="Cari Ayat"
-          className="px-5"
+          className="w-full justify-center"
+          menuPosition="top"
         />
       </div>
     </div>

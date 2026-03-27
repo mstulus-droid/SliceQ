@@ -3,6 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { DatabaseUnavailable } from "@/app/database-unavailable";
 import { HighlightedText } from "@/app/highlighted-text";
+import { HomeFooter } from "@/app/home-footer";
 import { getDatabaseErrorInfo } from "@/lib/db";
 import { HomeControls } from "@/app/home-controls";
 import {
@@ -219,6 +220,8 @@ export default async function Home({ searchParams }: HomePageProps) {
             ))}
           </div>
         </section>
+
+        <HomeFooter />
       </div>
     </main>
   );
