@@ -30,11 +30,16 @@ export function HomeFooter() {
       return undefined;
     }
 
-    const ctx = canvas.getContext("2d");
+    const canvasElement = canvas;
+    const footerElement = footer;
+
+    const ctx = canvasElement.getContext("2d");
 
     if (!ctx) {
       return undefined;
     }
+
+    const context = ctx;
 
     const state = {
       stars: [] as Star[],
@@ -130,15 +135,15 @@ export function HomeFooter() {
     }
 
     function resize() {
-      const rect = footer.getBoundingClientRect();
+      const rect = footerElement.getBoundingClientRect();
       state.width = Math.max(1, rect.width);
       state.height = Math.max(1, rect.height);
       state.dpr = Math.min(window.devicePixelRatio || 1, 2);
-      canvas.width = Math.round(state.width * state.dpr);
-      canvas.height = Math.round(state.height * state.dpr);
-      canvas.style.width = `${state.width}px`;
-      canvas.style.height = `${state.height}px`;
-      ctx.setTransform(state.dpr, 0, 0, state.dpr, 0, 0);
+      canvasElement.width = Math.round(state.width * state.dpr);
+      canvasElement.height = Math.round(state.height * state.dpr);
+      canvasElement.style.width = `${state.width}px`;
+      canvasElement.style.height = `${state.height}px`;
+      context.setTransform(state.dpr, 0, 0, state.dpr, 0, 0);
       buildStars();
     }
 
@@ -147,10 +152,10 @@ export function HomeFooter() {
         0.84 + Math.sin(tsSec * star.twinkle + star.twinkleOffset) * 0.16;
       const alpha = Math.max(0.08, Math.min(1, star.alpha * twinkle));
 
-      ctx.beginPath();
-      ctx.fillStyle = star.color.replace(/[\d.]+\)$/u, `${alpha})`);
-      ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2);
-      ctx.fill();
+      context.beginPath();
+      context.fillStyle = star.color.replace(/[\d.]+\)$/u, `${alpha})`);
+      context.arc(star.x, star.y, star.r, 0, Math.PI * 2);
+      context.fill();
     }
 
     function animate(ts: number) {
@@ -162,7 +167,7 @@ export function HomeFooter() {
       state.lastTs = ts;
       const tsSec = ts / 1000;
 
-      ctx.clearRect(0, 0, state.width, state.height);
+      context.clearRect(0, 0, state.width, state.height);
 
       for (let index = 0; index < state.stars.length; index += 1) {
         const star = state.stars[index];
