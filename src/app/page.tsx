@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { DatabaseUnavailable } from "@/app/database-unavailable";
 import { getDatabaseErrorInfo } from "@/lib/db";
+import { HomeControls } from "@/app/home-controls";
 import {
   type SurahListItem,
   type VerseRecord,
@@ -67,103 +68,20 @@ export default async function Home({ searchParams }: HomePageProps) {
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,#ece8db,transparent_24%),linear-gradient(180deg,#f3efe5_0%,#ece5d8_46%,#e7dfd2_100%)] px-4 py-5 text-slate-900 sm:px-6 sm:py-8 lg:px-10">
       <div className="mx-auto flex max-w-6xl flex-col gap-4">
-        <section className="rounded-[1.75rem] border border-white/60 bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(246,242,235,0.94))] p-4 shadow-[0_18px_60px_-42px_rgba(15,23,42,0.45)] backdrop-blur sm:p-6">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-            <div className="max-w-3xl">
-              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-slate-700">
-                SliceQ
-              </p>
-              <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">
-                Bedah quran langsung dari daftar surat dan ayat.
-              </h1>
-              <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
-                SliceQ diarahkan untuk pembacaan yang kritis, ringkas, dan non-apologis.
-                Masuk lewat daftar surat, telusuri ayat, lalu buka lapisan kritik, konteks, dan anotasi tanpa halaman perantara yang berlebihan.
-              </p>
-            </div>
-
-            <div className="flex flex-wrap gap-2 text-sm font-semibold">
-              <Link
-                href="/bookmark"
-                className="rounded-full border border-slate-300 bg-white px-4 py-2 text-slate-800 transition hover:bg-slate-50"
-              >
-                Bookmark
-              </Link>
-            </div>
-          </div>
-
-          <div className="mt-5 grid gap-3 lg:grid-cols-[1.15fr_0.85fr]">
-            <form
-              action="/"
-              className="rounded-[1.5rem] bg-[#171717] p-4 text-white shadow-[0_18px_50px_-36px_rgba(15,23,42,0.8)]"
-            >
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-emerald-300">
-                Cari Bedah Ayat
-              </p>
-              <div className="mt-3 flex flex-col gap-3 sm:flex-row">
-                <div className="min-w-0 flex-1 rounded-[1rem] bg-white px-4 py-3">
-                  <input
-                    name="q"
-                    defaultValue={query}
-                    placeholder="Cari tema, kritik, logical fallacy, atau terjemahan"
-                    className="w-full bg-transparent text-base text-slate-800 outline-none placeholder:text-slate-400"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="rounded-full bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300"
-                >
-                  Cari
-                </button>
-              </div>
-              <div className="mt-3 flex flex-wrap gap-2 text-xs font-semibold text-slate-300">
-                {quickQueries.map((item) => (
-                  <Link
-                    key={item}
-                    href={`/?q=${encodeURIComponent(item)}`}
-                    className="rounded-full border border-white/10 px-3 py-1.5 transition hover:bg-white/10"
-                  >
-                    {item}
-                  </Link>
-                ))}
-              </div>
-            </form>
-
-            <form
-              action="/"
-              className="rounded-[1.5rem] bg-[#faf7ef] p-4 ring-1 ring-amber-100"
-            >
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-amber-700">
-                Lompat Cepat
-              </p>
-              <div className="mt-3 grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
-                <input
-                  name="surah"
-                  defaultValue={hasSelectedSurah ? String(selectedSurahId) : ""}
-                  inputMode="numeric"
-                  placeholder="Nomor surat"
-                  className="rounded-[1rem] border border-slate-200 bg-white px-4 py-3 text-base text-slate-800 outline-none placeholder:text-slate-400"
-                />
-                <input
-                  name="ayat"
-                  defaultValue={hasSelectedAyah ? String(selectedAyahNumber) : ""}
-                  inputMode="numeric"
-                  placeholder="Nomor ayat"
-                  className="rounded-[1rem] border border-slate-200 bg-white px-4 py-3 text-base text-slate-800 outline-none placeholder:text-slate-400"
-                />
-                <button
-                  type="submit"
-                  className="rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 sm:w-fit"
-                >
-                  Buka
-                </button>
-              </div>
-              <p className="mt-3 text-sm leading-6 text-slate-600">
-                Isi nomor surat saja untuk membuka surat. Isi surat dan ayat sekaligus untuk langsung menuju ayat yang ingin dibedah.
-              </p>
-            </form>
+        <section className="px-1 pt-1">
+          <div className="flex items-center justify-center gap-4 text-center">
+            <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+              <span className="text-[#b42318]">Slice</span>
+              <span className="text-emerald-700">Q</span>
+            </h1>
           </div>
         </section>
+
+        <HomeControls
+          quickQueries={quickQueries}
+          selectedSurah={hasSelectedSurah ? String(selectedSurahId) : ""}
+          selectedAyat={hasSelectedAyah ? String(selectedAyahNumber) : ""}
+        />
 
         {query ? (
           <section className="rounded-[1.75rem] border border-slate-200 bg-white/92 p-4 shadow-[0_20px_60px_-40px_rgba(15,23,42,0.45)] sm:p-5">

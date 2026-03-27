@@ -37,8 +37,7 @@ Artinya:
 Lokal:
 
 - Beranda: `http://localhost:3000`
-- Daftar surat: `http://localhost:3000/surat`
-- Pencarian: `http://localhost:3000/cari`
+- Detail surat contoh: `http://localhost:3000/surat/1`
 - Bookmark: `http://localhost:3000/bookmark`
 
 Online:
@@ -66,6 +65,17 @@ Kalau `localhost` gagal, coba:
 http://127.0.0.1:3000
 ```
 
+Kalau ingin buka dari HP di jaringan Wi-Fi yang sama, pakai alamat network dari terminal, misalnya:
+
+```text
+http://192.168.0.54:3000
+```
+
+Catatan:
+
+- project ini sudah menambahkan `allowedDevOrigins` di `next.config.ts`
+- kalau IP lokal laptop berubah, update juga nilai `allowedDevOrigins`
+
 ## 5. Isi file .env.local
 
 File `.env.local` ada di root project.
@@ -73,13 +83,16 @@ File `.env.local` ada di root project.
 Contoh minimal:
 
 ```env
-DATABASE_URL=postgresql://postgres.PROJECT_REF:PASSWORD_YANG_SUDAH_DI_ENCODE@aws-1-ap-northeast-2.pooler.supabase.com:5432/postgres
+DATABASE_URL=postgresql://postgres.PROJECT_REF:PASSWORD_YANG_SUDAH_DI_ENCODE@aws-1-ap-northeast-2.pooler.supabase.com:6543/postgres
 EXCEL_PATH=./surat quran.xlsx
+DATABASE_POOL_MAX=1
 ```
 
 Catatan penting:
 
-- gunakan connection string `pooler` dari Supabase
+- untuk development lokal, pakai `Transaction pooler` dari Supabase
+- port `6543` biasanya dipakai untuk `Transaction pooler`
+- `DATABASE_POOL_MAX=1` disarankan untuk mencegah error terlalu banyak koneksi saat dev
 - jangan pakai direct host `db....supabase.co:5432` kalau koneksi lokal bermasalah
 - password harus di-encode kalau mengandung karakter spesial
 
@@ -146,16 +159,17 @@ Biasanya ini dipakai saat:
 Setelah `npm run import-excel` berhasil, cek:
 
 - `https://sliceq.rhadzor.id`
-- `https://sliceq.rhadzor.id/surat`
 - `https://sliceq.rhadzor.id/surat/1`
-- `https://sliceq.rhadzor.id/cari?q=pembalasan`
+- buka beberapa ayat dari homepage
+- buka bookmark
 
 Yang diharapkan:
 
-- statistik di homepage tampil
-- daftar surat muncul
+- homepage tampil normal
+- daftar surat dan search di homepage berfungsi
 - detail surat tampil normal
-- hasil pencarian sesuai keyword muncul
+- detail ayat tampil normal
+- bookmark tetap bekerja
 
 ## 10. Kalau sync gagal
 
@@ -166,15 +180,17 @@ Penyebab paling umum:
 - `DATABASE_URL` belum benar
 - password Supabase belum di-encode dengan benar
 - koneksi internet ke Supabase sedang bermasalah
+- pool koneksi lokal terlalu besar
 
 Yang perlu dicek:
 
 1. Tutup file Excel
 2. Pastikan `.env.local` ada di root project
 3. Pastikan `DATABASE_URL` diawali dengan `postgresql://`
-4. Pastikan yang dipakai adalah `pooler connection string`
+4. Pastikan yang dipakai adalah `Transaction pooler connection string`
 5. Pastikan karakter spesial di password sudah di-encode
-6. Jalankan:
+6. Pastikan `DATABASE_POOL_MAX=1` ada di `.env.local`
+7. Jalankan:
 
 ```powershell
 npm run import-excel -- --dry-run

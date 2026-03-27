@@ -16,10 +16,24 @@ function getDatabaseUrl() {
   return databaseUrl;
 }
 
+function readPoolSize() {
+  const configured = Number(process.env.DATABASE_POOL_MAX);
+
+  if (Number.isFinite(configured) && configured > 0) {
+    return configured;
+  }
+
+  return process.env.NODE_ENV === "development" ? 1 : 5;
+}
+
 export function getPool() {
   if (!global.__sliceqPool) {
     global.__sliceqPool = new Pool({
       connectionString: getDatabaseUrl(),
+      max: readPoolSize(),
+      idleTimeoutMillis: 10_000,
+      connectionTimeoutMillis: 10_000,
+      allowExitOnIdle: true,
     });
   }
 
