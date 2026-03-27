@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { DatabaseUnavailable } from "@/app/database-unavailable";
+import { HighlightedText } from "@/app/highlighted-text";
 import { getDatabaseErrorInfo } from "@/lib/db";
 import { HomeControls } from "@/app/home-controls";
 import {
@@ -82,7 +83,7 @@ export default async function Home({ searchParams }: HomePageProps) {
               />
             </div>
             <p className="max-w-xl text-sm leading-7 text-slate-600 sm:text-base">
-              Telusuri surat, buka ayat per ayat, dan baca anotasi kritis dengan tampilan yang lebih jelas.
+              Sebuah arsip baca untuk tafsir, kritik, dan kontradiksi.
             </p>
           </div>
         </section>
@@ -128,7 +129,10 @@ export default async function Home({ searchParams }: HomePageProps) {
                       {verse.surahNameIndonesian} • Ayat {verse.ayahNumber}
                     </p>
                     <p className="mt-2 text-sm font-semibold uppercase tracking-[0.18em] text-emerald-800">
-                      {verse.topic || "Tanpa topik"}
+                      <HighlightedText
+                        text={verse.topic || "Tanpa topik"}
+                        query={query}
+                      />
                     </p>
                     <Link
                       href={`/ayat/${verse.id}`}
@@ -137,11 +141,11 @@ export default async function Home({ searchParams }: HomePageProps) {
                       {verse.arabicText}
                     </Link>
                     <p className="mt-3 text-sm leading-7 text-slate-700">
-                      {verse.translation}
+                      <HighlightedText text={verse.translation} query={query} />
                     </p>
                     {verse.critique ? (
                       <p className="mt-3 rounded-[1rem] bg-white/80 p-3 text-sm leading-7 text-slate-600 ring-1 ring-slate-200">
-                        {verse.critique}
+                        <HighlightedText text={verse.critique} query={query} />
                       </p>
                     ) : null}
                   </article>

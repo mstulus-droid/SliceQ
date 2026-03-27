@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Mono, Manrope } from "next/font/google";
+import { InitialSplash } from "@/app/initial-splash";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -47,6 +48,7 @@ export default function RootLayout({
       className={`${manrope.variable} ${plexMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-stone-50 text-slate-950">
+        <InitialSplash />
         {children}
       </body>
     </html>
