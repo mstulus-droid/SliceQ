@@ -64,7 +64,7 @@ export default async function VerseDetailPage({ params }: PageProps) {
   }
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top,#e9f7ef,transparent_28%),linear-gradient(180deg,#f7f3ea_0%,#f4efe5_100%)] px-5 py-8 sm:px-8 lg:px-12">
+    <main className="min-h-screen bg-[radial-gradient(circle_at_top,#e9f7ef,transparent_28%),linear-gradient(180deg,#f7f3ea_0%,#f4efe5_100%)] px-4 py-6 sm:px-8 sm:py-8 lg:px-12">
       <div className="mx-auto flex max-w-5xl flex-col gap-5">
         <section className="rounded-[2rem] bg-slate-950 p-6 text-white shadow-[0_30px_80px_-35px_rgba(15,23,42,0.7)] sm:p-8">
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
@@ -76,7 +76,7 @@ export default async function VerseDetailPage({ params }: PageProps) {
                 {verse.surahNameIndonesian} Ayat {verse.ayahNumber}
               </h1>
               <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-300 sm:text-base">
-                Halaman ini dibuat supaya satu ayat bisa dibaca lebih fokus, lengkap dengan anotasi, kritik, dan navigasi ayat sebelumnya atau berikutnya.
+                Fokus pada satu ayat, dengan navigasi ringkas dan panel konteks yang nyaman dibaca dari layar kecil sekalipun.
               </p>
             </div>
             <div className="flex flex-wrap gap-2 md:justify-end">
@@ -96,7 +96,7 @@ export default async function VerseDetailPage({ params }: PageProps) {
                 href="/cari"
                 className="rounded-full bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300"
               >
-                Kembali ke cari
+                Cari lagi
               </Link>
             </div>
           </div>

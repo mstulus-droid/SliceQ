@@ -43,13 +43,13 @@ export function VerseReaderCard({
   const hasDualNotes = Boolean(logicalFallacies && moralConcerns);
 
   return (
-    <section className="rounded-[2rem] bg-white p-6 shadow-[0_20px_60px_-35px_rgba(15,23,42,0.35)] sm:p-8">
-      <div className="mb-5 flex justify-end">
+    <section className="rounded-[2rem] bg-white p-5 shadow-[0_20px_60px_-35px_rgba(15,23,42,0.35)] sm:p-8">
+      <div className="mb-5 flex justify-start sm:justify-end">
         <BookmarkButton verseId={verseId} isBookmarked={isBookmarked} />
       </div>
 
       {asbabunNuzul ? (
-        <div className="mb-6 border-l-2 border-amber-300 pl-4">
+        <div className="mb-6 rounded-[1.25rem] bg-amber-50/70 p-4 ring-1 ring-amber-100">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-700">
             Asbabun Nuzul
           </p>
@@ -66,9 +66,11 @@ export function VerseReaderCard({
         </p>
       </div>
 
-      <p className="text-right text-3xl leading-[2.1] text-slate-950 sm:text-5xl">
+      <div className="rounded-[1.5rem] bg-[linear-gradient(180deg,#faf8f1_0%,#ffffff_100%)] px-4 py-5 ring-1 ring-slate-200">
+        <p className="text-right text-3xl leading-[2.1] text-slate-950 sm:text-5xl">
         {arabicText}
-      </p>
+        </p>
+      </div>
       <p className="mt-6 text-base leading-8 text-slate-700 sm:text-lg">
         {translation}
       </p>
@@ -114,7 +116,7 @@ export function VerseReaderCard({
             <button
               type="button"
               onClick={() => goToVerse(previousVerseId)}
-              className="mt-3 inline-flex rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-100"
+              className="mt-3 inline-flex w-full justify-center rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-100 sm:w-auto"
             >
               Buka ayat sebelumnya
             </button>
@@ -131,7 +133,7 @@ export function VerseReaderCard({
             <button
               type="button"
               onClick={() => goToVerse(nextVerseId)}
-              className="mt-3 inline-flex rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-100"
+              className="mt-3 inline-flex w-full justify-center rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-100 sm:w-auto"
             >
               Buka ayat berikutnya
             </button>

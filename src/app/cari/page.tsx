@@ -65,10 +65,12 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     return <DatabaseUnavailable {...getDatabaseErrorInfo(error)} />;
   }
 
+  const quickQueries = ["rahmat", "munafik", "waris", "pembalasan", "tauhid"];
+
   return (
-    <main className="min-h-screen bg-[#f4f0e7] px-4 py-8 sm:px-6 lg:px-10">
+    <main className="min-h-screen bg-[radial-gradient(circle_at_top,#edf7ef,transparent_26%),linear-gradient(180deg,#f7f3e8_0%,#f4efe6_100%)] px-4 py-6 sm:px-6 sm:py-8 lg:px-10">
       <div className="mx-auto flex max-w-6xl flex-col gap-5">
-        <section className="rounded-[2rem] bg-white p-5 shadow-[0_20px_60px_-35px_rgba(15,23,42,0.35)] sm:p-8">
+        <section className="rounded-[2rem] border border-white/70 bg-white/85 p-5 shadow-[0_24px_70px_-38px_rgba(15,23,42,0.4)] backdrop-blur sm:p-8">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.25em] text-emerald-700">
@@ -77,24 +79,30 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
                 Cari ayat atau lompat cepat
               </h1>
+              <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
+                Mulai dari kata kunci, atau langsung pilih surat dan ayat jika kamu sudah tahu tujuanmu.
+              </p>
             </div>
-            <Link href="/" className="text-sm font-semibold text-slate-700">
+            <Link
+              href="/"
+              className="inline-flex w-fit rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+            >
               Kembali ke beranda
             </Link>
           </div>
 
           <div className="mt-6 grid gap-4 xl:grid-cols-[1.15fr_0.85fr]">
-            <form className="rounded-[1.75rem] bg-slate-950 p-4 text-white sm:p-5">
+            <form className="rounded-[1.75rem] bg-slate-950 p-4 text-white shadow-[0_20px_60px_-35px_rgba(15,23,42,0.8)] sm:p-5">
               <p className="text-sm font-semibold uppercase tracking-[0.2em] text-emerald-300">
                 Pencarian
               </p>
-              <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-                <div className="min-w-0 flex-1 rounded-[1rem] bg-white p-3">
+              <div className="mt-4 flex flex-col gap-3">
+                <div className="min-w-0 rounded-[1rem] bg-white px-4 py-3">
                   <input
                     name="q"
                     defaultValue={query}
                     placeholder="Cari terjemahan, topik, kritik, atau anotasi"
-                    className="w-full bg-transparent text-sm text-slate-700 outline-none"
+                    className="w-full bg-transparent text-base text-slate-800 outline-none placeholder:text-slate-400"
                   />
                 </div>
                 <div className="flex flex-col gap-3 sm:flex-row">
@@ -111,6 +119,17 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                     Reset
                   </Link>
                 </div>
+                <div className="flex flex-wrap gap-2 text-xs font-semibold text-slate-300">
+                  {quickQueries.map((item) => (
+                    <Link
+                      key={item}
+                      href={`/cari?q=${encodeURIComponent(item)}`}
+                      className="rounded-full border border-white/10 px-3 py-1.5 transition hover:bg-white/10"
+                    >
+                      {item}
+                    </Link>
+                  ))}
+                </div>
               </div>
             </form>
 
@@ -118,11 +137,11 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               <p className="text-sm font-semibold uppercase tracking-[0.2em] text-amber-700">
                 Shortcut Ayat
               </p>
-              <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
+              <div className="mt-4 grid gap-3">
                 <select
                   name="surah"
                   defaultValue={hasSelectedSurah ? String(selectedSurahId) : ""}
-                  className="min-w-0 rounded-[1rem] border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none"
+                  className="min-w-0 rounded-[1rem] border border-slate-200 bg-white px-4 py-3 text-base text-slate-800 outline-none"
                 >
                   <option value="">Pilih surat</option>
                   {surahs.map((item) => (
@@ -135,7 +154,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                 <select
                   name="ayat"
                   defaultValue={hasSelectedAyah ? String(selectedAyahNumber) : ""}
-                  className="min-w-0 rounded-[1rem] border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none"
+                  className="min-w-0 rounded-[1rem] border border-slate-200 bg-white px-4 py-3 text-base text-slate-800 outline-none"
                 >
                   <option value="">Pilih ayat</option>
                   {ayahOptions.map((item) => (
@@ -147,7 +166,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
                 <button
                   type="submit"
-                  className="rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+                  className="rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 sm:w-fit"
                 >
                   Buka
                 </button>
@@ -159,7 +178,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             {query ? <ActiveFilter label="Kata kunci" value={query} /> : null}
           </div>
 
-          <div className="mt-4 text-sm text-slate-600">
+          <div className="mt-4 rounded-[1.25rem] bg-slate-50 px-4 py-3 text-sm text-slate-600 ring-1 ring-slate-200">
             {query
               ? `Menampilkan ${verses.length} ayat sesuai pencarian.`
               : "Gunakan pencarian untuk menjelajah isi ayat, atau pakai shortcut untuk langsung membuka surat dan ayat tertentu."}
@@ -169,7 +188,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             {verses.map((verse) => (
               <article
                 key={`${verse.surahId}-${verse.ayahNumber}`}
-                className="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-5"
+                className="rounded-[1.6rem] border border-slate-200 bg-[linear-gradient(180deg,#fbfbf9_0%,#f8f5ef_100%)] p-4 shadow-[0_16px_45px_-40px_rgba(15,23,42,0.55)] sm:p-5"
               >
                 <div className="flex flex-col gap-3">
                   <div>
@@ -195,16 +214,16 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
                 <Link
                   href={`/ayat/${verse.id}`}
-                  className="mt-4 block rounded-[1.25rem] px-2 py-2 text-right text-2xl leading-[1.9] text-slate-950 transition hover:bg-white"
+                  className="mt-4 block rounded-[1.25rem] px-2 py-2 text-right text-2xl leading-[1.9] text-slate-950 transition hover:bg-white sm:text-3xl"
                 >
                   {verse.arabicText}
                 </Link>
-                <p className="mt-4 line-clamp-3 text-sm leading-7 text-slate-700">
+                <p className="mt-4 text-sm leading-7 text-slate-700">
                   {verse.translation}
                 </p>
 
                 {verse.critique ? (
-                  <p className="mt-4 text-sm leading-7 text-slate-600">
+                  <p className="mt-4 rounded-[1rem] bg-white/80 p-4 text-sm leading-7 text-slate-600 ring-1 ring-slate-200">
                     {verse.critique}
                   </p>
                 ) : null}
