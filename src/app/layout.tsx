@@ -16,7 +16,7 @@ const plexMono = IBM_Plex_Mono({
 export const metadata: Metadata = {
   title: "SliceQ",
   description:
-    "Scaffold aplikasi Quran explorer dengan anotasi, kritik, dan konteks ayat.",
+    "Bedah quran per ayat dengan pendekatan kritis, non-apologis, dan fokus pada anotasi, kritik, serta konteks.",
 };
 
 export default function RootLayout({
