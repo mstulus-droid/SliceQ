@@ -17,6 +17,23 @@ export const metadata: Metadata = {
   title: "SliceQ",
   description:
     "Bedah quran per ayat dengan pendekatan kritis, non-apologis, dan fokus pada anotasi, kritik, serta konteks.",
+  icons: {
+    icon: "/brand/sliceq-icon.webp",
+    shortcut: "/brand/sliceq-icon.webp",
+    apple: "/brand/sliceq-icon.webp",
+  },
+  openGraph: {
+    title: "SliceQ",
+    description:
+      "Bedah quran per ayat dengan pendekatan kritis, non-apologis, dan fokus pada anotasi, kritik, serta konteks.",
+    images: [
+      {
+        url: "/brand/sliceq-icon.webp",
+        width: 512,
+        height: 512,
+      },
+    ],
+  },
 };
 
 export default function RootLayout({

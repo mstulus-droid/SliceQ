@@ -35,9 +35,9 @@ export function DatabaseUnavailable({
               Yang perlu dicek
             </p>
             <div className="mt-3 space-y-2 text-sm leading-7 text-slate-700">
-              <p>1. Pastikan `DATABASE_URL` di `.env.local` mengarah ke host yang benar dan bisa diakses.</p>
-              <p>2. Kalau mau jalan lokal, pakai format dari `.env.example`: `postgresql://postgres:postgres@localhost:5432/sliceq`.</p>
-              <p>3. Kalau tetap pakai Supabase, cek DNS internet, nama host, port, dan password yang sudah di-encode.</p>
+              <p>1. Kalau pakai Supabase, `DATABASE_URL` harus ke host `.pooler.supabase.com` dengan port `6543`, bukan `5432`.</p>
+              <p>2. Pastikan `DATABASE_POOL_MAX=1` ada di environment yang sedang dipakai aplikasi.</p>
+              <p>3. Kalau ini terjadi di website online, ubah Environment Variables di Vercel lalu redeploy.</p>
               <p>4. Setelah `.env.local` diubah, restart `npm run dev`.</p>
             </div>
           </div>

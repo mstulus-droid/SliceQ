@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { DatabaseUnavailable } from "@/app/database-unavailable";
@@ -69,11 +70,20 @@ export default async function Home({ searchParams }: HomePageProps) {
     <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,#ece8db,transparent_24%),linear-gradient(180deg,#f3efe5_0%,#ece5d8_46%,#e7dfd2_100%)] px-4 py-5 text-slate-900 sm:px-6 sm:py-8 lg:px-10">
       <div className="mx-auto flex max-w-6xl flex-col gap-4">
         <section className="px-1 pt-1">
-          <div className="flex items-center justify-center gap-4 text-center">
-            <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-              <span className="text-[#b42318]">Slice</span>
-              <span className="text-emerald-700">Q</span>
-            </h1>
+          <div className="flex flex-col items-center justify-center gap-3 text-center">
+            <div className="relative h-[72px] w-[260px] sm:h-[88px] sm:w-[320px]">
+              <Image
+                src="/brand/sliceq-samping.webp"
+                alt="SliceQ"
+                fill
+                priority
+                sizes="(max-width: 640px) 260px, 320px"
+                className="object-contain"
+              />
+            </div>
+            <p className="max-w-xl text-sm leading-7 text-slate-600 sm:text-base">
+              Telusuri surat, buka ayat per ayat, dan baca anotasi kritis dengan tampilan yang lebih jelas.
+            </p>
           </div>
         </section>
 
