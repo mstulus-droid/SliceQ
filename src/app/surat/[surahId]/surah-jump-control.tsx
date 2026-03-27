@@ -4,9 +4,15 @@ import { useMemo, useState } from "react";
 
 type SurahJumpControlProps = {
   verseCount: number;
+  label?: string;
+  className?: string;
 };
 
-export function SurahJumpControl({ verseCount }: SurahJumpControlProps) {
+export function SurahJumpControl({
+  verseCount,
+  label = "Ayat",
+  className = "",
+}: SurahJumpControlProps) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
 
@@ -44,14 +50,14 @@ export function SurahJumpControl({ verseCount }: SurahJumpControlProps) {
         aria-label="Lompat ke ayat"
         title="Lompat ke ayat"
         onClick={() => setOpen((current) => !current)}
-        className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-emerald-400 px-4 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300"
+        className={`inline-flex h-11 items-center justify-center gap-2 rounded-full bg-emerald-400 px-4 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300 ${className}`.trim()}
       >
         <svg viewBox="0 0 24 24" className="h-5 w-5 fill-none stroke-current stroke-2">
           <path d="M8 7h8" strokeLinecap="round" />
           <path d="M8 12h8" strokeLinecap="round" />
           <path d="M8 17h5" strokeLinecap="round" />
         </svg>
-        Ayat
+        {label}
       </button>
 
       {open ? (
