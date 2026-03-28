@@ -136,20 +136,20 @@ export default async function SurahDetailPage({ params }: PageProps) {
               </p>
             ) : null}
 
-            <div className="mt-6 flex items-center justify-center gap-3">
+            <div className="mt-6 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 sm:flex sm:justify-center sm:gap-3">
               <SurahSearchControl
                 surahs={surahs.map((item) => ({
                   id: item.id,
                   nameLatin: item.nameLatin,
                   meaning: item.meaning,
                 }))}
-                className="min-w-[10.5rem] justify-center"
+                className="w-full min-w-0 px-3 sm:min-w-[9.5rem] sm:px-4"
               />
               <Link
                 href="/"
                 aria-label="Kembali ke home"
                 title="Kembali ke home"
-                className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/15 text-white transition hover:bg-white/10"
+                className="inline-flex h-11 w-12 items-center justify-center rounded-full border border-white/15 text-white transition hover:bg-white/10 sm:w-12"
               >
                 <svg viewBox="0 0 24 24" className="h-5 w-5 fill-none stroke-current stroke-2">
                   <path d="M4 11.5L12 5l8 6.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -158,7 +158,7 @@ export default async function SurahDetailPage({ params }: PageProps) {
               </Link>
               <SurahJumpControl
                 verseCount={surah.verseCount}
-                className="min-w-[10.5rem] justify-center"
+                className="w-full min-w-0 px-3 sm:min-w-[9.5rem] sm:px-4"
               />
             </div>
           </div>
