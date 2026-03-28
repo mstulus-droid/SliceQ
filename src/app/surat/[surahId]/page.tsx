@@ -52,6 +52,47 @@ function groupVersesByTopic(verses: VerseRecord[]): VerseTopicGroup[] {
   return groups;
 }
 
+function buildRevelationOrderText(
+  surah: SurahListItem,
+  previousByRevelation: SurahListItem | undefined,
+  nextByRevelation: SurahListItem | undefined,
+) {
+  if (surah.revelationOrder <= 0) {
+    return null;
+  }
+
+  return (
+    <>
+      Dalam urutan turunnya wahyu, surat ini turun ke-{surah.revelationOrder}
+      {previousByRevelation ? (
+        <>
+          {" "}
+          setelah{" "}
+          <Link
+            href={`/surat/${previousByRevelation.id}`}
+            className="font-semibold text-emerald-200 underline decoration-white/30 underline-offset-4 transition hover:text-white"
+          >
+            {previousByRevelation.nameLatin}
+          </Link>
+        </>
+      ) : null}
+      {nextByRevelation ? (
+        <>
+          {" "}
+          sebelum{" "}
+          <Link
+            href={`/surat/${nextByRevelation.id}`}
+            className="font-semibold text-emerald-200 underline decoration-white/30 underline-offset-4 transition hover:text-white"
+          >
+            {nextByRevelation.nameLatin}
+          </Link>
+        </>
+      ) : null}
+      .
+    </>
+  );
+}
+
 export async function generateMetadata({ params }: PageProps) {
   const { surahId } = await params;
   let surah = null;
@@ -100,9 +141,24 @@ export default async function SurahDetailPage({ params }: PageProps) {
   }
 
   const verseGroups = groupVersesByTopic(verses);
+  const surahsByRevelation = surahs
+    .filter((item) => item.revelationOrder > 0)
+    .sort((left, right) => left.revelationOrder - right.revelationOrder);
+  const currentRevelationIndex = surahsByRevelation.findIndex((item) => item.id === surah.id);
+  const previousByRevelation =
+    currentRevelationIndex > 0 ? surahsByRevelation[currentRevelationIndex - 1] : undefined;
+  const nextByRevelation =
+    currentRevelationIndex >= 0 && currentRevelationIndex < surahsByRevelation.length - 1
+      ? surahsByRevelation[currentRevelationIndex + 1]
+      : undefined;
+  const revelationOrderText = buildRevelationOrderText(
+    surah,
+    previousByRevelation,
+    nextByRevelation,
+  );
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,#eef6ef_0%,#f8f4ea_100%)] px-5 py-8 sm:px-8 lg:px-12">
+    <main className="min-h-screen bg-[linear-gradient(180deg,#eef6ef_0%,#f8f4ea_100%)] px-3 py-8 sm:px-8 lg:px-12">
       <div className="mx-auto flex max-w-6xl flex-col gap-5">
         <SurahStickyTitle title={surah.nameLatin} />
         <SurahFloatingControls
@@ -127,9 +183,12 @@ export default async function SurahDetailPage({ params }: PageProps) {
             <p className="mt-3 text-5xl text-white/90 sm:text-6xl">
               {surah.nameArabic}
             </p>
-            <p className="mt-4 text-sm leading-7 text-slate-300 sm:text-base">
-              {surah.meaning}, terdiri dari {surah.verseCount} ayat dan turun di {surah.revelationPlace}.
-            </p>
+            <div className="mt-4 space-y-2 text-sm leading-7 text-slate-300 sm:text-base">
+              <p>
+                {surah.meaning}, terdiri dari {surah.verseCount} ayat dan turun di {surah.revelationPlace}.
+              </p>
+              {revelationOrderText ? <p>{revelationOrderText}</p> : null}
+            </div>
             {surah.context ? (
               <p className="mt-4 whitespace-pre-line rounded-[1.25rem] border border-white/10 bg-white/8 px-4 py-3 text-left text-sm leading-7 text-slate-200">
                 {surah.context}
@@ -163,7 +222,7 @@ export default async function SurahDetailPage({ params }: PageProps) {
             </div>
           </div>
 
-          <div className="rounded-[1.5rem] bg-white px-5 py-4 shadow-[0_20px_60px_-35px_rgba(15,23,42,0.28)]">
+          <div className="rounded-[1.5rem] bg-white px-4 py-4 shadow-[0_20px_60px_-35px_rgba(15,23,42,0.28)] sm:px-5">
             <p className="text-sm leading-7 text-slate-600">
               Menampilkan semua ayat dari {surah.nameLatin}. Klik lafazh Arab untuk membuka detail ayat satu per satu.
             </p>
@@ -173,13 +232,13 @@ export default async function SurahDetailPage({ params }: PageProps) {
             {verseGroups.map((group, groupIndex) => (
               <section
                 key={`${group.topic || "tanpa-topik"}-${group.verses[0].ayahNumber}-${groupIndex}`}
-                className={group.topic ? "relative pl-6 sm:pl-8" : ""}
+                className={group.topic ? "relative sm:pl-8" : ""}
               >
                 {group.topic ? (
                   <>
-                    <div className="absolute bottom-8 left-2 top-14 w-px bg-emerald-200 sm:left-3" />
-                    <div className="absolute bottom-8 left-2 h-px w-4 bg-emerald-200 sm:left-3 sm:w-5" />
-                    <div className="sticky top-12 z-20 mb-3 rounded-[1.25rem] border border-emerald-200/80 bg-emerald-50/92 px-4 py-3 text-sm font-semibold leading-7 text-emerald-950 shadow-[0_12px_34px_-28px_rgba(6,78,59,0.5)] backdrop-blur sm:top-14">
+                    <div className="absolute bottom-8 left-3 top-14 hidden w-px bg-emerald-200 sm:block" />
+                    <div className="absolute bottom-8 left-3 hidden h-px w-5 bg-emerald-200 sm:block" />
+                    <div className="sticky top-12 z-20 mb-3 mx-auto w-fit rounded-[1.25rem] border border-emerald-200/80 bg-emerald-50/92 px-4 py-3 text-center text-sm font-semibold leading-7 text-emerald-950 shadow-[0_12px_34px_-28px_rgba(6,78,59,0.5)] backdrop-blur sm:mx-0 sm:w-auto sm:text-left sm:top-14">
                       {group.topic}
                     </div>
                   </>
@@ -190,7 +249,7 @@ export default async function SurahDetailPage({ params }: PageProps) {
                     <article
                       key={`${verse.surahId}-${verse.ayahNumber}`}
                       id={`ayat-${verse.ayahNumber}`}
-                      className="scroll-mt-28 rounded-[2rem] bg-white p-6 shadow-[0_20px_60px_-35px_rgba(15,23,42,0.35)]"
+                      className="scroll-mt-28 rounded-[2rem] bg-white p-4 shadow-[0_20px_60px_-35px_rgba(15,23,42,0.35)] sm:p-6"
                     >
                       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:gap-4">
                         <p className="text-sm font-bold uppercase tracking-[0.18em] text-emerald-900">

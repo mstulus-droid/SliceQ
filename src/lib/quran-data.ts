@@ -8,6 +8,7 @@ export type SurahListItem = {
   context: string;
   verseCount: number;
   revelationPlace: string;
+  revelationOrder: number;
 };
 
 export type VerseRecord = {
@@ -66,6 +67,7 @@ function mapSurah(row: {
   context: string;
   verse_count: number;
   revelation_place: string | null;
+  revelation_order: number;
 }): SurahListItem {
   return {
     id: row.id,
@@ -75,6 +77,7 @@ function mapSurah(row: {
     context: row.context,
     verseCount: row.verse_count,
     revelationPlace: row.revelation_place ?? "Tidak diketahui",
+    revelationOrder: row.revelation_order,
   };
 }
 
@@ -148,6 +151,7 @@ export async function getSurahs(limit?: number): Promise<SurahListItem[]> {
     context: string;
     verse_count: number;
     revelation_place: string | null;
+    revelation_order: number;
   }>(
     `
       select
@@ -157,6 +161,7 @@ export async function getSurahs(limit?: number): Promise<SurahListItem[]> {
         s.meaning,
         s.context,
         s.verse_count,
+        s.revelation_order,
         coalesce(mode() within group (order by v.revelation_place), 'Tidak diketahui') as revelation_place
       from surahs s
       left join verses v on v.surah_id = s.id
@@ -180,6 +185,7 @@ export async function getSurahById(id: number): Promise<SurahListItem | null> {
     context: string;
     verse_count: number;
     revelation_place: string | null;
+    revelation_order: number;
   }>(
     `
       select
@@ -189,6 +195,7 @@ export async function getSurahById(id: number): Promise<SurahListItem | null> {
         s.meaning,
         s.context,
         s.verse_count,
+        s.revelation_order,
         coalesce(mode() within group (order by v.revelation_place), 'Tidak diketahui') as revelation_place
       from surahs s
       left join verses v on v.surah_id = s.id

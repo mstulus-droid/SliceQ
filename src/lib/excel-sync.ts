@@ -11,6 +11,7 @@ type SurahRow = {
   meaning: string;
   context: string;
   verseCount: number;
+  revelationOrder: number;
 };
 
 type VerseRow = {
@@ -82,6 +83,7 @@ function parseSurahs(workbook: XLSX.WorkBook) {
       meaning: normalizeText(row[3]),
       context: normalizeMultilineText(row[6]),
       verseCount: normalizeInteger(row[4]),
+      revelationOrder: normalizeInteger(row[7]),
     }))
     .filter((row) => row.id > 0);
 }
@@ -118,7 +120,7 @@ function parseVerses(workbook: XLSX.WorkBook) {
 async function upsertSurahs(client: PoolClient, surahs: SurahRow[]) {
   await client.query(
     `
-      INSERT INTO surahs (id, name_arabic, name_latin, meaning, context, verse_count)
+      INSERT INTO surahs (id, name_arabic, name_latin, meaning, context, verse_count, revelation_order)
       SELECT *
       FROM UNNEST(
         $1::int[],
@@ -126,7 +128,8 @@ async function upsertSurahs(client: PoolClient, surahs: SurahRow[]) {
         $3::text[],
         $4::text[],
         $5::text[],
-        $6::int[]
+        $6::int[],
+        $7::int[]
       )
       ON CONFLICT (id)
       DO UPDATE SET
@@ -135,6 +138,7 @@ async function upsertSurahs(client: PoolClient, surahs: SurahRow[]) {
         meaning = EXCLUDED.meaning,
         context = EXCLUDED.context,
         verse_count = EXCLUDED.verse_count,
+        revelation_order = EXCLUDED.revelation_order,
         updated_at = NOW()
     `,
     [
@@ -144,6 +148,7 @@ async function upsertSurahs(client: PoolClient, surahs: SurahRow[]) {
       surahs.map((surah) => surah.meaning),
       surahs.map((surah) => surah.context),
       surahs.map((surah) => surah.verseCount),
+      surahs.map((surah) => surah.revelationOrder),
     ],
   );
 }
