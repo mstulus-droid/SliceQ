@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { DatabaseUnavailable } from "@/app/database-unavailable";
+import { BuildStamp } from "@/app/build-stamp";
 import { HighlightedText } from "@/app/highlighted-text";
 import { HomeFooter } from "@/app/home-footer";
 import { getDatabaseErrorInfo } from "@/lib/db";
@@ -86,6 +87,7 @@ export default async function Home({ searchParams }: HomePageProps) {
             <p className="max-w-xl text-sm leading-7 text-slate-600 sm:text-base">
               Sebuah arsip baca untuk tafsir, kritik, dan kontradiksi.
             </p>
+            <BuildStamp />
           </div>
         </section>
 

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 type SurahSearchOption = {
   id: number;
@@ -34,6 +35,7 @@ export function SurahSearchControl({
   const [query, setQuery] = useState("");
   const [isMobile, setIsMobile] = useState(false);
   const [viewportHeight, setViewportHeight] = useState(0);
+  const [viewportTop, setViewportTop] = useState(0);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -65,10 +67,12 @@ export function SurahSearchControl({
 
   useEffect(() => {
     function updateViewportState() {
+      const visualViewport = window.visualViewport;
       setIsMobile(window.matchMedia("(max-width: 639px)").matches);
       setViewportHeight(
-        Math.round(window.visualViewport?.height ?? window.innerHeight),
+        Math.round(visualViewport?.height ?? window.innerHeight),
       );
+      setViewportTop(Math.round(visualViewport?.offsetTop ?? 0));
     }
 
     updateViewportState();
@@ -94,9 +98,15 @@ export function SurahSearchControl({
       return undefined;
     }
 
-    inputRef.current?.focus();
+    const focusTimer = window.setTimeout(() => {
+      inputRef.current?.focus({ preventScroll: true });
+    }, isMobile ? 50 : 0);
 
     function handlePointerDown(event: PointerEvent) {
+      if (isMobile) {
+        return;
+      }
+
       const target = event.target;
 
       if (
@@ -117,9 +127,10 @@ export function SurahSearchControl({
     window.addEventListener("pointerdown", handlePointerDown);
 
     return () => {
+      window.clearTimeout(focusTimer);
       window.removeEventListener("pointerdown", handlePointerDown);
     };
-  }, [open]);
+  }, [isMobile, open]);
 
   useEffect(() => {
     if (!open) {
@@ -139,12 +150,92 @@ export function SurahSearchControl({
     };
   }, [open]);
 
+  useEffect(() => {
+    if (!(isMobile && open)) {
+      return undefined;
+    }
+
+    const previousBodyOverflow = document.body.style.overflow;
+    const previousHtmlOverflow = document.documentElement.style.overflow;
+
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousBodyOverflow;
+      document.documentElement.style.overflow = previousHtmlOverflow;
+    };
+  }, [isMobile, open]);
+
   const mobilePanelStyle =
     isMobile && viewportHeight > 0
       ? {
           maxHeight: `${Math.max(280, viewportHeight - 24)}px`,
+          top: `${viewportTop + 12}px`,
         }
       : undefined;
+
+  const panelContent = (
+    <>
+      {isMobile ? (
+        <button
+          type="button"
+          aria-label="Tutup pencarian surat"
+          className="fixed inset-0 z-[70] bg-slate-950/45 backdrop-blur-[1px]"
+          onClick={() => setOpen(false)}
+        />
+      ) : null}
+      <div
+        data-surah-search-panel="true"
+        style={mobilePanelStyle}
+        className={`z-[71] overflow-hidden rounded-[1.25rem] border border-white/10 bg-slate-950/95 p-2 text-left shadow-[0_24px_60px_-30px_rgba(15,23,42,0.8)] backdrop-blur ${
+          isMobile
+            ? "fixed inset-x-4"
+            : `absolute w-[min(18rem,calc(100vw-2rem))] max-sm:left-0 max-sm:right-auto sm:right-0 ${
+                menuPosition === "top" ? "bottom-14" : "top-14"
+              }`
+        }`}
+      >
+        <p className="px-2 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-300">
+          Cari Surat
+        </p>
+        <div className="px-2 pb-2">
+          <input
+            ref={inputRef}
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Nomor, nama, atau arti surat"
+            className="w-full rounded-[0.9rem] border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none placeholder:text-slate-400"
+          />
+        </div>
+        <div className="max-h-72 overflow-y-auto px-2 pb-2 pr-1 max-sm:max-h-[min(22rem,calc(100dvh-7rem))]">
+          <div className="grid gap-2">
+            {filteredSurahs.map((surah) => (
+              <Link
+                key={surah.id}
+                href={`/surat/${surah.id}`}
+                onClick={() => {
+                  setOpen(false);
+                  setQuery("");
+                }}
+                className="rounded-[0.95rem] border border-white/10 px-3 py-3 transition hover:bg-white/10"
+              >
+                <p className="text-sm font-semibold text-white">
+                  {surah.id}. {surah.nameLatin}
+                </p>
+                <p className="mt-1 text-xs text-slate-300">{surah.meaning}</p>
+              </Link>
+            ))}
+          </div>
+          {query.trim() && filteredSurahs.length === 0 ? (
+            <p className="px-1 py-3 text-sm text-slate-400">
+              Surat tidak ditemukan.
+            </p>
+          ) : null}
+        </div>
+      </div>
+    </>
+  );
 
   return (
     <div ref={containerRef} className="relative">
@@ -166,65 +257,9 @@ export function SurahSearchControl({
       </button>
 
       {open ? (
-        <>
-          {isMobile ? (
-            <button
-              type="button"
-              aria-label="Tutup pencarian surat"
-              className="fixed inset-0 z-50 bg-slate-950/45 backdrop-blur-[1px]"
-              onClick={() => setOpen(false)}
-            />
-          ) : null}
-          <div
-            data-surah-search-panel="true"
-            style={mobilePanelStyle}
-            className={`z-50 overflow-hidden rounded-[1.25rem] border border-white/10 bg-slate-950/95 p-2 text-left shadow-[0_24px_60px_-30px_rgba(15,23,42,0.8)] backdrop-blur ${
-              isMobile
-                ? "fixed inset-x-4 top-3"
-                : `absolute w-[min(18rem,calc(100vw-2rem))] max-sm:left-0 max-sm:right-auto sm:right-0 ${
-                    menuPosition === "top" ? "bottom-14" : "top-14"
-                  }`
-            }`}
-          >
-            <p className="px-2 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-300">
-              Cari Surat
-            </p>
-            <div className="px-2 pb-2">
-              <input
-                ref={inputRef}
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder="Nomor, nama, atau arti surat"
-                className="w-full rounded-[0.9rem] border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none placeholder:text-slate-400"
-              />
-            </div>
-            <div className="max-h-72 overflow-y-auto px-2 pb-2 pr-1 max-sm:max-h-[min(22rem,calc(100dvh-7rem))]">
-              <div className="grid gap-2">
-                {filteredSurahs.map((surah) => (
-                  <Link
-                    key={surah.id}
-                    href={`/surat/${surah.id}`}
-                    onClick={() => {
-                      setOpen(false);
-                      setQuery("");
-                    }}
-                    className="rounded-[0.95rem] border border-white/10 px-3 py-3 transition hover:bg-white/10"
-                  >
-                    <p className="text-sm font-semibold text-white">
-                      {surah.id}. {surah.nameLatin}
-                    </p>
-                    <p className="mt-1 text-xs text-slate-300">{surah.meaning}</p>
-                  </Link>
-                ))}
-              </div>
-              {query.trim() && filteredSurahs.length === 0 ? (
-                <p className="px-1 py-3 text-sm text-slate-400">
-                  Surat tidak ditemukan.
-                </p>
-              ) : null}
-            </div>
-          </div>
-        </>
+        isMobile && typeof document !== "undefined"
+          ? createPortal(panelContent, document.body)
+          : panelContent
       ) : null}
     </div>
   );
