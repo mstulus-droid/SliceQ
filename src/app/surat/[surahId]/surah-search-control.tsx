@@ -13,6 +13,7 @@ type SurahSearchControlProps = {
   surahs: SurahSearchOption[];
   className?: string;
   menuPosition?: "top" | "bottom";
+  onOpenChange?: (open: boolean) => void;
 };
 
 function normalizeValue(value: string) {
@@ -27,6 +28,7 @@ export function SurahSearchControl({
   surahs,
   className = "",
   menuPosition = "bottom",
+  onOpenChange,
 }: SurahSearchControlProps) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -56,6 +58,10 @@ export function SurahSearchControl({
       })
       .slice(0, 8);
   }, [query, surahs]);
+
+  useEffect(() => {
+    onOpenChange?.(open);
+  }, [open, onOpenChange]);
 
   useEffect(() => {
     function updateViewportState() {

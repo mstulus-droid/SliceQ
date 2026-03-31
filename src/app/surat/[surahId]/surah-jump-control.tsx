@@ -7,6 +7,7 @@ type SurahJumpControlProps = {
   label?: string;
   className?: string;
   menuPosition?: "top" | "bottom";
+  onOpenChange?: (open: boolean) => void;
 };
 
 export function SurahJumpControl({
@@ -14,6 +15,7 @@ export function SurahJumpControl({
   label = "Lompat Ayat",
   className = "",
   menuPosition = "bottom",
+  onOpenChange,
 }: SurahJumpControlProps) {
   const [open, setOpen] = useState(false);
   const [activeAyah, setActiveAyah] = useState(1);
@@ -24,6 +26,10 @@ export function SurahJumpControl({
     () => Array.from({ length: verseCount }, (_, index) => index + 1),
     [verseCount],
   );
+
+  useEffect(() => {
+    onOpenChange?.(open);
+  }, [open, onOpenChange]);
 
   useEffect(() => {
     if (!open) {

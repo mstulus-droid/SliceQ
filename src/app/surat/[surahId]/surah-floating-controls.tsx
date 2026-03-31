@@ -21,10 +21,17 @@ export function SurahFloatingControls({
   surahs,
 }: SurahFloatingControlsProps) {
   const [isVisible, setIsVisible] = useState(false);
+  const [activeMenu, setActiveMenu] = useState<"search" | "jump" | null>(null);
   const lastScrollY = useRef(0);
 
   useEffect(() => {
     function updateVisibility() {
+      if (activeMenu) {
+        setIsVisible(true);
+        lastScrollY.current = window.scrollY;
+        return;
+      }
+
       const currentScrollY = window.scrollY;
 
       if (currentScrollY <= SHOW_AFTER_SCROLL_Y) {
@@ -44,22 +51,25 @@ export function SurahFloatingControls({
     return () => {
       window.removeEventListener("scroll", updateVisibility);
     };
-  }, []);
+  }, [activeMenu]);
+
+  const shouldShow = isVisible || activeMenu !== null;
 
   return (
     <div
       className={`pointer-events-none fixed inset-x-0 bottom-5 z-40 flex justify-center px-4 transition-all duration-300 ${
-        isVisible
+        shouldShow
           ? "translate-y-0 opacity-100"
           : "translate-y-4 opacity-0"
       }`}
-      aria-hidden={!isVisible}
+      aria-hidden={!shouldShow}
     >
       <div className="pointer-events-auto grid min-w-[min(100%,28rem)] grid-cols-[minmax(0,1fr)_48px_minmax(0,1fr)] items-center gap-2 rounded-full border border-slate-200/80 bg-white/95 p-2 shadow-[0_18px_50px_-28px_rgba(15,23,42,0.45)] backdrop-blur">
         <SurahSearchControl
           surahs={surahs}
           className="w-full justify-center"
           menuPosition="top"
+          onOpenChange={(open) => setActiveMenu(open ? "search" : null)}
         />
         <Link
           href="/"
@@ -88,6 +98,7 @@ export function SurahFloatingControls({
           label="Cari Ayat"
           className="w-full justify-center"
           menuPosition="top"
+          onOpenChange={(open) => setActiveMenu(open ? "jump" : null)}
         />
       </div>
     </div>
