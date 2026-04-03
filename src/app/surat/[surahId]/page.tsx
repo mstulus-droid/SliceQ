@@ -9,6 +9,7 @@ import {
   getSurahById,
   getVersesBySurahId,
 } from "@/lib/quran-data";
+import { SurahContextToggle } from "./surah-context-toggle";
 import { SurahFloatingControls } from "./surah-floating-controls";
 import { SurahJumpControl } from "./surah-jump-control";
 import { SurahSearchControl } from "./surah-search-control";
@@ -190,9 +191,7 @@ export default async function SurahDetailPage({ params }: PageProps) {
               {revelationOrderText ? <p>{revelationOrderText}</p> : null}
             </div>
             {surah.context ? (
-              <p className="mt-4 whitespace-pre-line rounded-[1.25rem] border border-white/10 bg-white/8 px-4 py-3 text-left text-sm leading-7 text-slate-200">
-                {surah.context}
-              </p>
+              <SurahContextToggle context={surah.context} />
             ) : null}
 
             <div className="mt-6 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 sm:flex sm:justify-center sm:gap-3">

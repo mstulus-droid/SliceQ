@@ -1,7 +1,6 @@
 "use client";
 
-import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 type SurahOption = {
@@ -11,24 +10,46 @@ type SurahOption = {
 };
 
 type HomeControlsProps = {
-  quickQueries: string[];
+  openPanel: "search" | "jump" | null;
+  onPanelChange: (panel: "search" | "jump" | null) => void;
   selectedSurah: string;
   selectedAyat: string;
   surahs: SurahOption[];
+  onSearch?: (query: string) => void;
+  onResetSearch?: () => void;
+  isSearching?: boolean;
 };
 
-type PanelKey = "search" | "jump" | null;
-
 export function HomeControls({
-  quickQueries,
+  openPanel,
+  onPanelChange,
   selectedSurah,
   selectedAyat,
   surahs,
+  onSearch,
+  onResetSearch,
+  isSearching,
 }: HomeControlsProps) {
   const router = useRouter();
-  const [openPanel, setOpenPanel] = useState<PanelKey>(null);
   const [surahQuery, setSurahQuery] = useState(selectedSurah);
   const [ayahQuery, setAyahQuery] = useState(selectedAyat);
+  const [searchQuery, setSearchQuery] = useState("");
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const jumpInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (openPanel === "search") {
+      searchInputRef.current?.focus();
+    } else if (openPanel === "jump") {
+      jumpInputRef.current?.focus();
+    }
+  }, [openPanel]);
+
+  useEffect(() => {
+    if (openPanel !== "search") {
+      setSearchQuery("");
+    }
+  }, [openPanel]);
 
   function normalizeValue(value: string) {
     return value
@@ -80,15 +101,32 @@ export function HomeControls({
     }
 
     router.push(`/?${params.toString()}`);
-    setOpenPanel(null);
+    onPanelChange(null);
   }
 
-  function togglePanel(panel: Exclude<PanelKey, null>) {
-    setOpenPanel((current) => (current === panel ? null : panel));
+  function togglePanel(panel: "search" | "jump") {
+    const next = openPanel === panel ? null : panel;
+    onPanelChange(next);
+    if (!next) {
+      onResetSearch?.();
+    }
+  }
+
+  function handleSearchSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const q = searchQuery.trim();
+    if (q && onSearch) {
+      onSearch(q);
+    }
+  }
+
+  function handleClearSearch() {
+    setSearchQuery("");
+    searchInputRef.current?.focus();
   }
 
   return (
-    <div className="rounded-[1.75rem] border border-white/60 bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(246,242,235,0.94))] p-4 shadow-[0_18px_60px_-42px_rgba(15,23,42,0.45)] backdrop-blur sm:p-6">
+    <div className="bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(246,242,235,0.94))] p-4 backdrop-blur sm:p-6">
       <div className="flex flex-wrap items-center justify-center gap-2">
         <button
           type="button"
@@ -112,73 +150,103 @@ export function HomeControls({
         >
           Lompat Cepat
         </button>
-        <Link
+        <a
           href="/bookmark"
           className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-50"
         >
           Bookmark
-        </Link>
+        </a>
       </div>
 
-        {openPanel === "search" ? (
-          <form
-            action="/"
-            className="mt-4 rounded-[1.5rem] bg-[#171717] p-4 text-white shadow-[0_18px_50px_-36px_rgba(15,23,42,0.8)]"
+      {openPanel === "search" ? (
+        <form
+          onSubmit={handleSearchSubmit}
+          className="mt-4 rounded-[1.5rem] bg-[#171717] p-4 text-white shadow-[0_18px_50px_-36px_rgba(15,23,42,0.8)]"
         >
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-emerald-300">
-            Cari Kata
-          </p>
-          <div className="mt-3 flex flex-col gap-3 sm:flex-row">
-            <div className="min-w-0 flex-1 rounded-[1rem] bg-white px-4 py-3">
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <div className="flex min-w-0 flex-1 items-center gap-2 rounded-[1rem] bg-white px-4 py-3">
               <input
-                name="q"
+                ref={searchInputRef}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Cari tema, kritik, logical fallacy, atau terjemahan"
-                className="w-full bg-transparent text-base text-slate-800 outline-none placeholder:text-slate-400"
+                className="min-w-0 flex-1 bg-transparent text-base text-slate-800 outline-none placeholder:text-slate-400"
               />
+              {searchQuery ? (
+                <button
+                  type="button"
+                  onClick={handleClearSearch}
+                  className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-200 text-slate-500 transition hover:bg-slate-300 hover:text-slate-700"
+                  aria-label="Hapus"
+                >
+                  <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current">
+                    <path d="M18.3 5.71a.996.996 0 00-1.41 0L12 10.59 7.11 5.7A.996.996 0 105.7 7.11L10.59 12 5.7 16.89a.996.996 0 101.41 1.41L12 13.41l4.89 4.89a.996.996 0 101.41-1.41L13.41 12l4.89-4.89c.38-.38.38-1.02 0-1.4z" />
+                  </svg>
+                </button>
+              ) : null}
             </div>
             <button
               type="submit"
-              className="rounded-full bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300"
+              disabled={isSearching}
+              className="rounded-full bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300 disabled:opacity-60"
             >
-              Cari
+              {isSearching ? "Mencari..." : "Cari"}
             </button>
-          </div>
-          <div className="mt-3 flex flex-wrap gap-2 text-xs font-semibold text-slate-300">
-            {quickQueries.map((item) => (
-              <Link
-                key={item}
-                href={`/?q=${encodeURIComponent(item)}`}
-                className="rounded-full border border-white/10 px-3 py-1.5 transition hover:bg-white/10"
-              >
-                {item}
-              </Link>
-            ))}
           </div>
         </form>
       ) : null}
 
-        {openPanel === "jump" ? (
-          <form
-            onSubmit={handleJumpSubmit}
-            className="mt-4 rounded-[1.5rem] bg-[#faf7ef] p-4 ring-1 ring-amber-100"
+      {openPanel === "jump" ? (
+        <form
+          onSubmit={handleJumpSubmit}
+          className="mt-4 rounded-[1.5rem] bg-[#faf7ef] p-4 ring-1 ring-amber-100"
         >
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-amber-700">
-            Lompat Cepat
-          </p>
-          <div className="mt-3 grid gap-3 sm:grid-cols-[1.2fr_0.8fr_auto]">
-            <input
-              value={surahQuery}
-              onChange={(event) => setSurahQuery(event.target.value)}
-              placeholder="Nomor, nama, atau arti surat"
-              className="rounded-[1rem] border border-slate-200 bg-white px-4 py-3 text-base text-slate-800 outline-none placeholder:text-slate-400"
-            />
-            <input
-              value={ayahQuery}
-              onChange={(event) => setAyahQuery(event.target.value)}
-              inputMode="numeric"
-              placeholder="Nomor ayat"
-              className="rounded-[1rem] border border-slate-200 bg-white px-4 py-3 text-base text-slate-800 outline-none placeholder:text-slate-400"
-            />
+          <div className="grid gap-3 sm:grid-cols-[1.2fr_0.8fr_auto]">
+            <div className="flex items-center gap-2 rounded-[1rem] border border-slate-200 bg-white px-4 py-3">
+              <input
+                ref={jumpInputRef}
+                value={surahQuery}
+                onChange={(event) => setSurahQuery(event.target.value)}
+                placeholder="Nomor, nama, atau arti surat"
+                className="min-w-0 flex-1 bg-transparent text-base text-slate-800 outline-none placeholder:text-slate-400"
+              />
+              {surahQuery ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSurahQuery("");
+                    jumpInputRef.current?.focus();
+                  }}
+                  className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-200 text-slate-500 transition hover:bg-slate-300 hover:text-slate-700"
+                  aria-label="Hapus"
+                >
+                  <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current">
+                    <path d="M18.3 5.71a.996.996 0 00-1.41 0L12 10.59 7.11 5.7A.996.996 0 105.7 7.11L10.59 12 5.7 16.89a.996.996 0 101.41 1.41L12 13.41l4.89 4.89a.996.996 0 101.41-1.41L13.41 12l4.89-4.89c.38-.38.38-1.02 0-1.4z" />
+                  </svg>
+                </button>
+              ) : null}
+            </div>
+            <div className="flex items-center gap-2 rounded-[1rem] border border-slate-200 bg-white px-4 py-3">
+              <input
+                value={ayahQuery}
+                onChange={(event) => setAyahQuery(event.target.value)}
+                inputMode="numeric"
+                placeholder="Nomor ayat"
+                className="min-w-0 flex-1 bg-transparent text-base text-slate-800 outline-none placeholder:text-slate-400"
+              />
+              {ayahQuery ? (
+                <button
+                  type="button"
+                  onClick={() => setAyahQuery("")}
+                  className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-200 text-slate-500 transition hover:bg-slate-300 hover:text-slate-700"
+                  aria-label="Hapus"
+                >
+                  <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current">
+                    <path d="M18.3 5.71a.996.996 0 00-1.41 0L12 10.59 7.11 5.7A.996.996 0 105.7 7.11L10.59 12 5.7 16.89a.996.996 0 101.41 1.41L12 13.41l4.89 4.89a.996.996 0 101.41-1.41L13.41 12l4.89-4.89c.38-.38.38-1.02 0-1.4z" />
+                  </svg>
+                </button>
+              ) : null}
+            </div>
             <button
               type="submit"
               className="rounded-full bg-[#171717] px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 sm:w-fit"

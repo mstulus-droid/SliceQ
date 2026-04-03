@@ -6,26 +6,18 @@ import { useEffect, useState } from "react";
 const SPLASH_STORAGE_KEY = "sliceq-initial-splash-shown";
 
 export function InitialSplash() {
-  const [isVisible, setIsVisible] = useState(() => {
-    if (typeof window === "undefined") {
-      return false;
-    }
-
-    const hasShownSplash = window.sessionStorage.getItem(SPLASH_STORAGE_KEY);
-
-    if (hasShownSplash) {
-      return false;
-    }
-
-    window.sessionStorage.setItem(SPLASH_STORAGE_KEY, "true");
-    return true;
-  });
+  const [isVisible, setIsVisible] = useState(true);
   const [isClosing, setIsClosing] = useState(false);
 
   useEffect(() => {
-    if (!isVisible) {
+    const hasShownSplash = window.sessionStorage.getItem(SPLASH_STORAGE_KEY);
+
+    if (hasShownSplash) {
+      setIsVisible(false);
       return undefined;
     }
+
+    window.sessionStorage.setItem(SPLASH_STORAGE_KEY, "true");
 
     const startClosingTimer = window.setTimeout(() => {
       setIsClosing(true);
@@ -39,7 +31,7 @@ export function InitialSplash() {
       window.clearTimeout(startClosingTimer);
       window.clearTimeout(hideTimer);
     };
-  }, [isVisible]);
+  }, []);
 
   if (!isVisible) {
     return null;

@@ -33,8 +33,10 @@ export function SurahFloatingControls({
       }
 
       const currentScrollY = window.scrollY;
+      const header = document.getElementById("surah-header");
+      const isHeaderVisible = header ? header.getBoundingClientRect().bottom > 0 : false;
 
-      if (currentScrollY <= SHOW_AFTER_SCROLL_Y) {
+      if (currentScrollY <= SHOW_AFTER_SCROLL_Y || isHeaderVisible) {
         setIsVisible(false);
       } else if (currentScrollY < lastScrollY.current) {
         setIsVisible(true);
