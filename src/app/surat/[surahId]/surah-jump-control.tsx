@@ -12,7 +12,7 @@ type SurahJumpControlProps = {
 
 export function SurahJumpControl({
   verseCount,
-  label = "Lompat Ayat",
+  label = "Ke Ayat",
   className = "",
   menuPosition = "bottom",
   onOpenChange,
@@ -130,8 +130,8 @@ export function SurahJumpControl({
     <div ref={containerRef} className="relative">
       <button
         type="button"
-        aria-label="Lompat ke ayat"
-        title="Lompat ke ayat"
+        aria-label="Ke ayat"
+        title="Ke ayat"
         onClick={() => setOpen((current) => !current)}
         className={`inline-flex h-11 items-center justify-center gap-2 rounded-full bg-emerald-400 px-4 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300 ${className}`.trim()}
       >

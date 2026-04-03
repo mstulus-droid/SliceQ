@@ -14,6 +14,7 @@ import { SurahFloatingControls } from "./surah-floating-controls";
 import { SurahJumpControl } from "./surah-jump-control";
 import { SurahSearchControl } from "./surah-search-control";
 import { SurahStickyTitle } from "./surah-sticky-title";
+import { SurahTopicPanel } from "./surah-topic-panel";
 import { VerseAnalysisDisclosures } from "./verse-analysis-disclosures";
 
 type PageProps = {
@@ -227,11 +228,21 @@ export default async function SurahDetailPage({ params }: PageProps) {
             </p>
           </div>
 
+          <SurahTopicPanel
+            topics={verseGroups
+              .filter((g) => g.topic)
+              .map((g, i) => ({
+                id: `topic-group-${i}`,
+                label: g.topic,
+              }))}
+          />
+
           <div className="space-y-5">
             {verseGroups.map((group, groupIndex) => (
               <section
+                id={`topic-group-${groupIndex}`}
                 key={`${group.topic || "tanpa-topik"}-${group.verses[0].ayahNumber}-${groupIndex}`}
-                className={group.topic ? "relative sm:pl-8" : ""}
+                className={group.topic ? "relative sm:pl-8 scroll-mt-24" : "scroll-mt-24"}
               >
                 {group.topic ? (
                   <>

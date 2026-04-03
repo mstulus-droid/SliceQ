@@ -97,7 +97,7 @@ export function SurahFloatingControls({
         </Link>
         <SurahJumpControl
           verseCount={verseCount}
-          label="Cari Ayat"
+          label="Ke Ayat"
           className="w-full justify-center"
           menuPosition="top"
           onOpenChange={(open) => setActiveMenu(open ? "jump" : null)}
