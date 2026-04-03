@@ -25,6 +25,8 @@ function scoreVerse(verse: VerseRecord, query: string): number {
   score += countMatches(verse.topic, q) * 2;
   score += countMatches(verse.logicalFallacies, q) * 1;
   score += countMatches(verse.moralConcerns, q) * 1;
+  score += countMatches(verse.scientificErrors, q) * 1;
+  score += countMatches(verse.contradictions, q) * 1;
   score += countMatches(verse.surahNameIndonesian, q) * 4;
   score += countMatches(verse.arabicText, q) * 1;
 
@@ -47,14 +49,14 @@ export async function searchVersesAction(query: string): Promise<VerseRecord[]> 
   const seen = new Set<string>();
   const deduped = scored.filter((s) => {
     const hasAnalysis =
-      s.verse.critique || s.verse.logicalFallacies || s.verse.moralConcerns;
+      s.verse.critique || s.verse.logicalFallacies || s.verse.moralConcerns || s.verse.scientificErrors || s.verse.contradictions;
 
     if (hasAnalysis) {
       const normalizeKey = (text: string | null | undefined) =>
         String(text ?? "")
           .toLowerCase()
           .replace(/\s+/g, "");
-      const key = `${normalizeKey(s.verse.critique)}||${normalizeKey(s.verse.logicalFallacies)}||${normalizeKey(s.verse.moralConcerns)}`;
+      const key = `${normalizeKey(s.verse.critique)}||${normalizeKey(s.verse.logicalFallacies)}||${normalizeKey(s.verse.moralConcerns)}||${normalizeKey(s.verse.scientificErrors)}||${normalizeKey(s.verse.contradictions)}`;
       if (seen.has(key)) {
         return false;
       }

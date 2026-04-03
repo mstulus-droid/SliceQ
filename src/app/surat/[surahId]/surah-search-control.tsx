@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
@@ -31,6 +32,7 @@ export function SurahSearchControl({
   menuPosition = "bottom",
   onOpenChange,
 }: SurahSearchControlProps) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [isMobile, setIsMobile] = useState(false);
@@ -204,6 +206,14 @@ export function SurahSearchControl({
             ref={inputRef}
             value={query}
             onChange={(event) => setQuery(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" && filteredSurahs.length > 0) {
+                const first = filteredSurahs[0];
+                setOpen(false);
+                setQuery("");
+                router.push(`/surat/${first.id}`);
+              }
+            }}
             placeholder="Nomor, nama, atau arti surat"
             className="w-full rounded-[0.9rem] border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none placeholder:text-slate-400"
           />

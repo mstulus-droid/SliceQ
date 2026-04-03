@@ -162,7 +162,7 @@ export default async function SurahDetailPage({ params }: PageProps) {
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,#eef6ef_0%,#f8f4ea_100%)] px-3 py-8 sm:px-8 lg:px-12">
       <div className="mx-auto flex max-w-6xl flex-col gap-5">
-        <SurahStickyTitle title={surah.nameLatin} />
+        <SurahStickyTitle surahNumber={surah.id} title={surah.nameLatin} />
         <SurahFloatingControls
           verseCount={surah.verseCount}
           surahs={surahs.map((item) => ({
@@ -299,6 +299,8 @@ export default async function SurahDetailPage({ params }: PageProps) {
                         critique={verse.critique}
                         logicalFallacies={verse.logicalFallacies}
                         moralConcerns={verse.moralConcerns}
+                        scientificErrors={verse.scientificErrors}
+                        contradictions={verse.contradictions}
                       />
                     </article>
                   ))}

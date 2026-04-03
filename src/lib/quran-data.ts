@@ -25,6 +25,8 @@ export type VerseRecord = {
   asbabunNuzul: string;
   logicalFallacies: string;
   moralConcerns: string;
+  scientificErrors: string;
+  contradictions: string;
 };
 
 export type HomeStats = {
@@ -95,6 +97,8 @@ function mapVerse(row: {
   asbabun_nuzul: string;
   logical_fallacies: string;
   moral_concerns: string;
+  scientific_errors: string;
+  contradictions: string;
 }): VerseRecord {
   return {
     id: row.id,
@@ -110,6 +114,8 @@ function mapVerse(row: {
     asbabunNuzul: row.asbabun_nuzul,
     logicalFallacies: row.logical_fallacies,
     moralConcerns: row.moral_concerns,
+    scientificErrors: row.scientific_errors,
+    contradictions: row.contradictions,
   };
 }
 
@@ -131,6 +137,8 @@ export async function getHomeStats(): Promise<HomeStats> {
            or coalesce(asbabun_nuzul, '') <> ''
            or coalesce(logical_fallacies, '') <> ''
            or coalesce(moral_concerns, '') <> ''
+           or coalesce(scientific_errors, '') <> ''
+           or coalesce(contradictions, '') <> ''
       ) as analysis_count
   `);
 
@@ -224,6 +232,8 @@ export async function getVersesBySurahId(surahId: number): Promise<VerseRecord[]
     asbabun_nuzul: string;
     logical_fallacies: string;
     moral_concerns: string;
+    scientific_errors: string;
+    contradictions: string;
   }>(
     `
       select
@@ -239,7 +249,9 @@ export async function getVersesBySurahId(surahId: number): Promise<VerseRecord[]
         a.critique,
         a.asbabun_nuzul,
         a.logical_fallacies,
-        a.moral_concerns
+        a.moral_concerns,
+        a.scientific_errors,
+        a.contradictions
       from verses v
       join verse_analyses a on a.verse_id = v.id
       where v.surah_id = $1
@@ -267,6 +279,8 @@ export async function getVerseById(verseId: number): Promise<VerseRecord | null>
     asbabun_nuzul: string;
     logical_fallacies: string;
     moral_concerns: string;
+    scientific_errors: string;
+    contradictions: string;
   }>(
     `
       select
@@ -282,7 +296,9 @@ export async function getVerseById(verseId: number): Promise<VerseRecord | null>
         a.critique,
         a.asbabun_nuzul,
         a.logical_fallacies,
-        a.moral_concerns
+        a.moral_concerns,
+        a.scientific_errors,
+        a.contradictions
       from verses v
       join verse_analyses a on a.verse_id = v.id
       where v.id = $1
@@ -349,6 +365,8 @@ export async function getHighlightedVerses(limit = 3): Promise<VerseRecord[]> {
     asbabun_nuzul: string;
     logical_fallacies: string;
     moral_concerns: string;
+    scientific_errors: string;
+    contradictions: string;
   }>(
     `
       select
@@ -364,7 +382,9 @@ export async function getHighlightedVerses(limit = 3): Promise<VerseRecord[]> {
         a.critique,
         a.asbabun_nuzul,
         a.logical_fallacies,
-        a.moral_concerns
+        a.moral_concerns,
+        a.scientific_errors,
+        a.contradictions
       from verses v
       join verse_analyses a on a.verse_id = v.id
       order by v.surah_id, v.ayah_number
@@ -408,6 +428,8 @@ export async function getBookmarks(): Promise<BookmarkRecord[]> {
     asbabun_nuzul: string;
     logical_fallacies: string;
     moral_concerns: string;
+    scientific_errors: string;
+    contradictions: string;
     bookmarked_at: string;
     note: string;
   }>(
@@ -426,6 +448,8 @@ export async function getBookmarks(): Promise<BookmarkRecord[]> {
         a.asbabun_nuzul,
         a.logical_fallacies,
         a.moral_concerns,
+        a.scientific_errors,
+        a.contradictions,
         b.created_at as bookmarked_at,
         b.note
       from bookmarks b
@@ -456,6 +480,8 @@ export async function getSearchFilterOptions(): Promise<SearchFilterOptions> {
     revelation_place: string | null;
     logical_fallacies: string;
     moral_concerns: string;
+    scientific_errors: string;
+    contradictions: string;
   }>(`
     select
       v.revelation_place,
@@ -525,6 +551,8 @@ export async function searchVersesWithFilters({
     asbabun_nuzul: string;
     logical_fallacies: string;
     moral_concerns: string;
+    scientific_errors: string;
+    contradictions: string;
   }>(
     `
       select
@@ -540,7 +568,9 @@ export async function searchVersesWithFilters({
         a.critique,
         a.asbabun_nuzul,
         a.logical_fallacies,
-        a.moral_concerns
+        a.moral_concerns,
+        a.scientific_errors,
+        a.contradictions
       from verses v
       join verse_analyses a on a.verse_id = v.id
       where
@@ -552,6 +582,8 @@ export async function searchVersesWithFilters({
           or a.critique ilike '%' || $1 || '%'
           or a.logical_fallacies ilike '%' || $1 || '%'
           or a.moral_concerns ilike '%' || $1 || '%'
+          or a.scientific_errors ilike '%' || $1 || '%'
+          or a.contradictions ilike '%' || $1 || '%'
         )
         and ($2 = '' or v.revelation_place = $2)
         and ($3 = '' or a.logical_fallacies ilike $3 || ' - %' or a.logical_fallacies = $3)

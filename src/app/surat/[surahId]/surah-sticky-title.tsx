@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 
 type SurahStickyTitleProps = {
+  surahNumber: number;
   title: string;
   targetId?: string;
 };
@@ -10,6 +11,7 @@ type SurahStickyTitleProps = {
 const SHOW_AFTER_SCROLL_Y = 220;
 
 export function SurahStickyTitle({
+  surahNumber,
   title,
   targetId = "surah-header",
 }: SurahStickyTitleProps) {
@@ -52,7 +54,7 @@ export function SurahStickyTitle({
             onClick={scrollToHeader}
             className="pointer-events-auto block w-full truncate text-base font-semibold tracking-[0.08em] text-white"
           >
-            {title}
+            {surahNumber} : {title}
           </button>
         </div>
       </div>

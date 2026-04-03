@@ -37,9 +37,17 @@ CREATE TABLE IF NOT EXISTS verse_analyses (
   asbabun_nuzul TEXT NOT NULL DEFAULT '',
   logical_fallacies TEXT NOT NULL DEFAULT '',
   moral_concerns TEXT NOT NULL DEFAULT '',
+  scientific_errors TEXT NOT NULL DEFAULT '',
+  contradictions TEXT NOT NULL DEFAULT '',
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+ALTER TABLE verse_analyses
+ADD COLUMN IF NOT EXISTS scientific_errors TEXT NOT NULL DEFAULT '';
+
+ALTER TABLE verse_analyses
+ADD COLUMN IF NOT EXISTS contradictions TEXT NOT NULL DEFAULT '';
 
 CREATE TABLE IF NOT EXISTS bookmarks (
   id BIGSERIAL PRIMARY KEY,
@@ -53,5 +61,7 @@ CREATE INDEX IF NOT EXISTS idx_verses_surah_id ON verses(surah_id);
 CREATE INDEX IF NOT EXISTS idx_verses_revelation_place ON verses(revelation_place);
 CREATE INDEX IF NOT EXISTS idx_verse_analyses_topic ON verse_analyses USING GIN (to_tsvector('simple', topic));
 CREATE INDEX IF NOT EXISTS idx_verse_analyses_critique ON verse_analyses USING GIN (to_tsvector('simple', critique));
+CREATE INDEX IF NOT EXISTS idx_verse_analyses_scientific_errors ON verse_analyses USING GIN (to_tsvector('simple', scientific_errors));
+CREATE INDEX IF NOT EXISTS idx_verse_analyses_contradictions ON verse_analyses USING GIN (to_tsvector('simple', contradictions));
 CREATE INDEX IF NOT EXISTS idx_verses_translation ON verses USING GIN (to_tsvector('simple', translation));
 CREATE INDEX IF NOT EXISTS idx_bookmarks_created_at ON bookmarks(created_at DESC);

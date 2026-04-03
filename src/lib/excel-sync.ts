@@ -27,6 +27,8 @@ type VerseRow = {
   asbabunNuzul: string;
   logicalFallacies: string;
   moralConcerns: string;
+  scientificErrors: string;
+  contradictions: string;
 };
 
 export type SyncResult = {
@@ -113,6 +115,8 @@ function parseVerses(workbook: XLSX.WorkBook) {
       asbabunNuzul: normalizeText(row["Asbabun Nuzul (Muchlis M Hanafi)"]),
       logicalFallacies: normalizeText(row["LOGICAL FALLACIES"]),
       moralConcerns: normalizeText(row["MORAL CONCERNS"]),
+      scientificErrors: normalizeText(row["SCIENTIFIC ERRORS"]),
+      contradictions: normalizeText(row["CONTRADICTIONS"]),
     }))
     .filter((row) => row.surahId > 0 && row.ayahNumber > 0);
 }
@@ -171,7 +175,9 @@ async function replaceVerses(client: PoolClient, verses: VerseRow[]) {
           $9::text[],
           $10::text[],
           $11::text[],
-          $12::text[]
+          $12::text[],
+          $13::text[],
+          $14::text[]
         ) WITH ORDINALITY AS data(
           surah_id,
           ayah_number,
@@ -185,6 +191,8 @@ async function replaceVerses(client: PoolClient, verses: VerseRow[]) {
           asbabun_nuzul,
           logical_fallacies,
           moral_concerns,
+          scientific_errors,
+          contradictions,
           row_number
         )
       ),
@@ -216,7 +224,9 @@ async function replaceVerses(client: PoolClient, verses: VerseRow[]) {
         critique,
         asbabun_nuzul,
         logical_fallacies,
-        moral_concerns
+        moral_concerns,
+        scientific_errors,
+        contradictions
       )
       SELECT
         inserted.id,
@@ -224,7 +234,9 @@ async function replaceVerses(client: PoolClient, verses: VerseRow[]) {
         source_data.critique,
         source_data.asbabun_nuzul,
         source_data.logical_fallacies,
-        source_data.moral_concerns
+        source_data.moral_concerns,
+        source_data.scientific_errors,
+        source_data.contradictions
       FROM inserted
       JOIN source_data
         ON source_data.row_number = inserted.id
@@ -242,6 +254,8 @@ async function replaceVerses(client: PoolClient, verses: VerseRow[]) {
       verses.map((verse) => verse.asbabunNuzul),
       verses.map((verse) => verse.logicalFallacies),
       verses.map((verse) => verse.moralConcerns),
+      verses.map((verse) => verse.scientificErrors),
+      verses.map((verse) => verse.contradictions),
     ],
   );
 }

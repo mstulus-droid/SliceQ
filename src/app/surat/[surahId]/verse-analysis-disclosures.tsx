@@ -1,19 +1,24 @@
 "use client";
 
 import { useState } from "react";
+import { parseNotes } from "@/lib/parse-notes";
 
 type VerseAnalysisDisclosuresProps = {
   critique: string;
   logicalFallacies: string;
   moralConcerns: string;
+  scientificErrors: string;
+  contradictions: string;
 };
 
-type PanelKey = "critique" | "fallacies" | "morals" | null;
+type PanelKey = "critique" | "fallacies" | "morals" | "science" | "contradictions" | null;
 
 export function VerseAnalysisDisclosures({
   critique,
   logicalFallacies,
   moralConcerns,
+  scientificErrors,
+  contradictions,
 }: VerseAnalysisDisclosuresProps) {
   const [openPanel, setOpenPanel] = useState<PanelKey>(null);
 
@@ -49,6 +54,28 @@ export function VerseAnalysisDisclosures({
           buttonClass:
             "border-rose-200 bg-rose-50 text-rose-800 hover:bg-rose-100",
           panelClass: "bg-rose-50 text-slate-700 ring-rose-100",
+        }
+      : null,
+    scientificErrors
+      ? {
+          key: "science" as const,
+          label: "Scientific Error",
+          content: scientificErrors,
+          icon: <span className="text-lg leading-none">🔬</span>,
+          buttonClass:
+            "border-cyan-200 bg-cyan-50 text-cyan-800 hover:bg-cyan-100",
+          panelClass: "bg-cyan-50 text-slate-700 ring-cyan-100",
+        }
+      : null,
+    contradictions
+      ? {
+          key: "contradictions" as const,
+          label: "Contradiction",
+          content: contradictions,
+          icon: <span className="text-lg leading-none">⚡</span>,
+          buttonClass:
+            "border-violet-200 bg-violet-50 text-violet-800 hover:bg-violet-100",
+          panelClass: "bg-violet-50 text-slate-700 ring-violet-100",
         }
       : null,
   ].filter(Boolean);
@@ -89,6 +116,8 @@ export function VerseAnalysisDisclosures({
           return null;
         }
 
+        const notes = parseNotes(item.content);
+
         return (
           <div
             key={item.key}
@@ -96,8 +125,21 @@ export function VerseAnalysisDisclosures({
           >
             <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em]">
               {item.label}
+              {notes.length > 1 ? (
+                <span className="ml-2 inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-current/15 px-1.5 text-[10px] font-bold tabular-nums">
+                  {notes.length}
+                </span>
+              ) : null}
             </p>
-            {item.content}
+            {notes.length === 1 ? (
+              <div className="text-slate-700">{notes[0]}</div>
+            ) : (
+              <ol className="list-decimal space-y-2 pl-4 text-slate-700">
+                {notes.slice(0, 5).map((note, idx) => (
+                  <li key={idx}>{note}</li>
+                ))}
+              </ol>
+            )}
           </div>
         );
       })}

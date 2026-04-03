@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
+import { parseNotes } from "@/lib/parse-notes";
 
 type VerseReaderCardProps = {
   arabicText: string;
@@ -11,6 +12,8 @@ type VerseReaderCardProps = {
   critique: string;
   logicalFallacies: string;
   moralConcerns: string;
+  scientificErrors: string;
+  contradictions: string;
   previousVerseId: number | null;
   nextVerseId: number | null;
 };
@@ -23,6 +26,8 @@ export function VerseReaderCard({
   critique,
   logicalFallacies,
   moralConcerns,
+  scientificErrors,
+  contradictions,
   previousVerseId,
   nextVerseId,
 }: VerseReaderCardProps) {
@@ -59,6 +64,20 @@ export function VerseReaderCard({
       border: "border-rose-400",
       bg: "bg-rose-50/70",
       labelColor: "text-rose-700",
+    },
+    {
+      label: "Scientific Error",
+      text: scientificErrors,
+      border: "border-cyan-400",
+      bg: "bg-cyan-50/70",
+      labelColor: "text-cyan-700",
+    },
+    {
+      label: "Contradiction",
+      text: contradictions,
+      border: "border-violet-400",
+      bg: "bg-violet-50/70",
+      labelColor: "text-violet-700",
     },
   ].filter((n) => n.text);
   const noteCount = notes.length;
@@ -142,7 +161,7 @@ export function VerseReaderCard({
                 <p className={`text-[10px] font-semibold uppercase tracking-wider ${notes[0].labelColor}`}>
                   {notes[0].label}
                 </p>
-                <p className="mt-1 text-sm leading-6 text-slate-700">{notes[0].text}</p>
+                <div className="mt-1 text-sm leading-6 text-slate-700"><NoteContent text={notes[0].text} /></div>
               </div>
             </div>
           ) : noteCount === 2 ? (
@@ -173,7 +192,7 @@ export function VerseReaderCard({
                     <p className={`text-[10px] font-semibold uppercase tracking-wider ${note.labelColor}`}>
                       {note.label}
                     </p>
-                    <p className="mt-1 text-sm leading-6 text-slate-700">{note.text}</p>
+                    <div className="mt-1 text-sm leading-6 text-slate-700"><NoteContent text={note.text} /></div>
                   </div>
                 ))}
               </div>
@@ -182,10 +201,24 @@ export function VerseReaderCard({
         </div>
       ) : null}
 
-      {noteCount === 3 ? (
+      {noteCount >= 3 ? (
         <CenterScrollEffect containerRef={scrollRef} />
       ) : null}
     </section>
+  );
+}
+
+function NoteContent({ text }: { text: string }) {
+  const notes = parseNotes(text);
+  if (notes.length === 1) {
+    return <p>{notes[0]}</p>;
+  }
+  return (
+    <ol className="list-decimal space-y-1 pl-4 text-left">
+      {notes.slice(0, 5).map((note, idx) => (
+        <li key={idx}>{note}</li>
+      ))}
+    </ol>
   );
 }
 

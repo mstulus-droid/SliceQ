@@ -110,6 +110,8 @@ export default async function VerseDetailPage({ params }: PageProps) {
           critique={verse.critique}
           logicalFallacies={verse.logicalFallacies}
           moralConcerns={verse.moralConcerns}
+          scientificErrors={verse.scientificErrors}
+          contradictions={verse.contradictions}
           previousVerseId={neighbors.previousVerseId}
           nextVerseId={neighbors.nextVerseId}
         />
