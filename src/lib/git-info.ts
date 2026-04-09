@@ -1,6 +1,6 @@
 export const GIT_INFO = {
-  "hash": "b00b911",
-  "message": "feat(navigasi): tambahkan animasi loading saat navigasi antar halaman\n\n- Buat NavigationProvider context untuk tracking state navigasi\n- Buat NavigationLoading component dengan animasi spinner\n- Buat NavLink component yang trigger loading saat diklik\n- Ganti semua Link internal dengan NavLink\n- Update layout.tsx wrap dengan Suspense untuk useSearchParams\n- Tambahkan loading state pada navigasi ayat prev/next di verse-reader-card",
-  "date": "2026-04-09 16:52:07 +0700",
+  "hash": "a13bb59",
+  "message": "feat(version): tambahkan popup info commit saat klik logo\n\n- Buat script git-info.js untuk generate informasi commit saat build\n- Buat komponen CommitInfoPopup untuk menampilkan popup versi\n- Update package.json untuk jalankan git-info sebelum dev/build\n- Update page.tsx wrap logo dengan CommitInfoPopup\n- Tampilkan: commit hash, branch, tanggal build, dan pesan commit lengkap",
+  "date": "2026-04-09 17:00:17 +0700",
   "branch": "main"
 };
