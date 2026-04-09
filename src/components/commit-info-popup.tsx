@@ -17,6 +17,9 @@ export function CommitInfoPopup({ children }: { children: React.ReactNode }) {
     });
   }
 
+  // Extract first line of commit message (the title)
+  const commitTitle = GIT_INFO.message.split('\n')[0];
+
   return (
     <>
       <button
@@ -24,7 +27,7 @@ export function CommitInfoPopup({ children }: { children: React.ReactNode }) {
         onClick={() => setIsOpen(true)}
         className="cursor-pointer"
         aria-label="Lihat informasi versi"
-        title="Klik untuk melihat versi commit"
+        title="Klik untuk melihat versi"
       >
         {children}
       </button>
@@ -39,27 +42,12 @@ export function CommitInfoPopup({ children }: { children: React.ReactNode }) {
           />
 
           {/* Popup */}
-          <div className="fixed left-1/2 top-1/2 z-[101] w-[min(90vw,28rem)] -translate-x-1/2 -translate-y-1/2 rounded-[1.5rem] border border-emerald-200/80 bg-white shadow-[0_24px_60px_-20px_rgba(15,23,42,0.4)]">
+          <div className="fixed left-1/2 top-1/2 z-[101] w-[min(90vw,24rem)] -translate-x-1/2 -translate-y-1/2 rounded-[1.25rem] border border-emerald-200/80 bg-white shadow-[0_24px_60px_-20px_rgba(15,23,42,0.4)]">
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-emerald-100 px-5 py-4">
-              <div className="flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700">
-                  <svg
-                    viewBox="0 0 24 24"
-                    className="h-4 w-4"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path d="M12 2L2 7l10 5 10-5-10-5z" strokeLinecap="round" strokeLinejoin="round" />
-                    <path d="M2 17l10 5 10-5" strokeLinecap="round" strokeLinejoin="round" />
-                    <path d="M2 12l10 5 10-5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </div>
-                <span className="text-sm font-semibold text-emerald-800">
-                  Informasi Versi
-                </span>
-              </div>
+            <div className="flex items-center justify-between border-b border-emerald-100 px-5 py-3">
+              <span className="text-sm font-semibold text-emerald-800">
+                Versi Aplikasi
+              </span>
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
@@ -79,49 +67,15 @@ export function CommitInfoPopup({ children }: { children: React.ReactNode }) {
             </div>
 
             {/* Content */}
-            <div className="px-5 py-5">
-              {/* Commit Hash */}
-              <div className="mb-4">
-                <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
-                  Commit Hash
-                </p>
-                <div className="mt-1 flex items-center gap-2">
-                  <code className="rounded-lg bg-slate-100 px-3 py-1.5 text-sm font-mono font-semibold text-emerald-700">
-                    {GIT_INFO.hash}
-                  </code>
-                  <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700">
-                    {GIT_INFO.branch}
-                  </span>
-                </div>
-              </div>
+            <div className="px-5 py-4">
+              {/* Commit Message */}
+              <p className="text-sm font-medium text-slate-800">
+                {commitTitle}
+              </p>
 
               {/* Date */}
-              <div className="mb-4">
-                <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
-                  Tanggal Build
-                </p>
-                <p className="mt-1 text-sm text-slate-700">
-                  {formatDate(GIT_INFO.date)}
-                </p>
-              </div>
-
-              {/* Commit Message */}
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
-                  Pesan Commit
-                </p>
-                <div className="mt-1 rounded-xl bg-slate-50 p-3">
-                  <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-700">
-                    {GIT_INFO.message}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Footer */}
-            <div className="border-t border-slate-100 px-5 py-3">
-              <p className="text-center text-xs text-slate-400">
-                SliceQ © {new Date().getFullYear()}
+              <p className="mt-2 text-xs text-slate-500">
+                {formatDate(GIT_INFO.date)}
               </p>
             </div>
           </div>
