@@ -139,20 +139,15 @@ export function SurahTopicPanel({ topics }: SurahTopicPanelProps) {
                       data-topic-id={topic.id}
                       type="button"
                       onClick={() => scrollToTopic(topic.id)}
-                      className={`rounded-xl px-4 py-3 text-left transition ${
+                      className={`rounded-xl px-4 py-3 text-left text-sm font-medium transition ${
                         isActive
                           ? "bg-emerald-50 text-emerald-900 ring-1 ring-emerald-200"
                           : "text-slate-700 hover:bg-slate-50"
                       }`}
                     >
-                      <span className="block text-xs font-medium text-emerald-600 mb-0.5">
-                        {topic.startAyah === topic.endAyah
-                          ? `Ayat ${topic.startAyah}`
-                          : `Ayat ${topic.startAyah}-${topic.endAyah}`}
-                      </span>
-                      <span className="block text-sm font-medium">
-                        {topic.label}
-                      </span>
+                      {topic.startAyah === topic.endAyah
+                        ? `${topic.startAyah} : ${topic.label}`
+                        : `${topic.startAyah}-${topic.endAyah} : ${topic.label}`}
                     </button>
                   );
                 })}

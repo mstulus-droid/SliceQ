@@ -250,15 +250,10 @@ export default async function SurahDetailPage({ params }: PageProps) {
                   <>
                     <div className="absolute bottom-8 left-3 top-14 hidden w-px bg-emerald-200 sm:block" />
                     <div className="absolute bottom-8 left-3 hidden h-px w-5 bg-emerald-200 sm:block" />
-                    <div className="sticky top-12 z-20 mb-3 mx-auto w-fit rounded-[1.25rem] border border-emerald-200/80 bg-emerald-50/92 px-4 py-3 text-center text-sm leading-6 text-emerald-950 shadow-[0_12px_34px_-28px_rgba(6,78,59,0.5)] backdrop-blur sm:mx-0 sm:w-auto sm:text-left sm:top-14">
-                      <span className="block text-xs font-medium text-emerald-600">
-                        {group.verses[0].ayahNumber === group.verses[group.verses.length - 1].ayahNumber
-                          ? `Ayat ${group.verses[0].ayahNumber}`
-                          : `Ayat ${group.verses[0].ayahNumber}-${group.verses[group.verses.length - 1].ayahNumber}`}
-                      </span>
-                      <span className="block font-semibold">
-                        {group.topic}
-                      </span>
+                    <div className="sticky top-12 z-20 mb-3 mx-auto w-fit rounded-[1.25rem] border border-emerald-200/80 bg-emerald-50/92 px-4 py-3 text-center text-sm font-semibold leading-7 text-emerald-950 shadow-[0_12px_34px_-28px_rgba(6,78,59,0.5)] backdrop-blur sm:mx-0 sm:w-auto sm:text-left sm:top-14">
+                      {group.verses[0].ayahNumber === group.verses[group.verses.length - 1].ayahNumber
+                        ? `${group.verses[0].ayahNumber} : ${group.topic}`
+                        : `${group.verses[0].ayahNumber}-${group.verses[group.verses.length - 1].ayahNumber} : ${group.topic}`}
                     </div>
                   </>
                 ) : null}
