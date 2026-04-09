@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { NavLink } from "@/components/nav-link";
 import { notFound } from "next/navigation";
 import { DatabaseUnavailable } from "@/app/database-unavailable";
 import { getDatabaseErrorInfo } from "@/lib/db";
@@ -75,7 +75,7 @@ export default async function VerseDetailPage({ params }: PageProps) {
               </h1>
             </div>
             <div className="flex items-center justify-center gap-2">
-              <Link
+              <NavLink
                 href={`/surat/${verse.surahId}#ayat-${verse.ayahNumber}`}
                 aria-label="Kembali ke surat utuhnya"
                 title="Kembali ke surat utuhnya"
@@ -85,8 +85,8 @@ export default async function VerseDetailPage({ params }: PageProps) {
                   <path d="M15 18l-6-6 6-6" strokeLinecap="round" strokeLinejoin="round" />
                   <path d="M9 12h10" strokeLinecap="round" />
                 </svg>
-              </Link>
-              <Link
+              </NavLink>
+              <NavLink
                 href="/"
                 aria-label="Kembali ke home"
                 title="Kembali ke home"
@@ -96,7 +96,7 @@ export default async function VerseDetailPage({ params }: PageProps) {
                   <path d="M4 11.5L12 5l8 6.5" strokeLinecap="round" strokeLinejoin="round" />
                   <path d="M6.5 10.5V19h11v-8.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
-              </Link>
+              </NavLink>
               <BookmarkButton verseId={verse.id} isBookmarked={bookmarked} iconOnly />
             </div>
           </div>

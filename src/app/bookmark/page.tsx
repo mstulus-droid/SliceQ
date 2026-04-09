@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { NavLink } from "@/components/nav-link";
 import { DatabaseUnavailable } from "@/app/database-unavailable";
 import { getDatabaseErrorInfo } from "@/lib/db";
 import { getBookmarks } from "@/lib/quran-data";
@@ -32,12 +32,12 @@ export default async function BookmarkPage() {
                 Kembali ke ayat yang pernah kamu tandai tanpa perlu mengulang pencarian dari awal.
               </p>
             </div>
-            <Link
+            <NavLink
               href="/"
               className="inline-flex w-fit rounded-full border border-white/15 px-4 py-2 text-sm font-semibold text-emerald-300 transition hover:bg-white/10"
             >
               Kembali ke beranda
-            </Link>
+            </NavLink>
           </div>
         </section>
 
@@ -50,7 +50,7 @@ export default async function BookmarkPage() {
 
           <div className="grid gap-4">
             {bookmarks.map((bookmark) => (
-              <Link
+              <NavLink
                 key={bookmark.id}
                 href={`/ayat/${bookmark.id}`}
                 className="block rounded-[1.5rem] border border-slate-200 bg-[linear-gradient(180deg,#fbfbf9_0%,#f8f5ef_100%)] p-4 shadow-[0_16px_45px_-40px_rgba(15,23,42,0.55)] transition hover:bg-[#f7f4ed] sm:p-5"
@@ -61,7 +61,7 @@ export default async function BookmarkPage() {
                 <p className="mt-3 text-right text-2xl leading-[1.9] text-slate-950 sm:text-3xl">
                   {bookmark.arabicText}
                 </p>
-              </Link>
+              </NavLink>
             ))}
           </div>
         </section>

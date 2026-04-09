@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { NavLink } from "@/components/nav-link";
 import { notFound } from "next/navigation";
 import { DatabaseUnavailable } from "@/app/database-unavailable";
 import { getDatabaseErrorInfo } from "@/lib/db";
@@ -70,24 +70,24 @@ function buildRevelationOrderText(
         <>
           {" "}
           setelah{" "}
-          <Link
+          <NavLink
             href={`/surat/${previousByRevelation.id}`}
             className="font-semibold text-emerald-200 underline decoration-white/30 underline-offset-4 transition hover:text-white"
           >
             {previousByRevelation.nameLatin}
-          </Link>
+          </NavLink>
         </>
       ) : null}
       {nextByRevelation ? (
         <>
           {" "}
           sebelum{" "}
-          <Link
+          <NavLink
             href={`/surat/${nextByRevelation.id}`}
             className="font-semibold text-emerald-200 underline decoration-white/30 underline-offset-4 transition hover:text-white"
           >
             {nextByRevelation.nameLatin}
-          </Link>
+          </NavLink>
         </>
       ) : null}
       .
@@ -204,7 +204,7 @@ export default async function SurahDetailPage({ params }: PageProps) {
                 }))}
                 className="w-full min-w-0 px-3 sm:min-w-[9.5rem] sm:px-4"
               />
-              <Link
+              <NavLink
                 href="/"
                 aria-label="Kembali ke home"
                 title="Kembali ke home"
@@ -214,7 +214,7 @@ export default async function SurahDetailPage({ params }: PageProps) {
                   <path d="M4 11.5L12 5l8 6.5" strokeLinecap="round" strokeLinejoin="round" />
                   <path d="M6.5 10.5V19h11v-8.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
-              </Link>
+              </NavLink>
               <SurahJumpControl
                 verseCount={surah.verseCount}
                 className="w-full min-w-0 px-3 sm:min-w-[9.5rem] sm:px-4"
@@ -287,7 +287,7 @@ export default async function SurahDetailPage({ params }: PageProps) {
                         </div>
                       ) : null}
 
-                      <Link
+                      <NavLink
                         href={`/ayat/${verse.id}`}
                         className="mt-5 block rounded-[1.4rem] bg-[linear-gradient(180deg,#faf8f1_0%,#ffffff_100%)] px-4 py-5 ring-1 ring-slate-200 transition hover:bg-slate-50"
                       >
@@ -297,7 +297,7 @@ export default async function SurahDetailPage({ params }: PageProps) {
                         <p className="mt-4 text-base leading-8 text-slate-700">
                           {verse.translation}
                         </p>
-                      </Link>
+                      </NavLink>
 
                       <VerseAnalysisDisclosures
                         critique={verse.critique}

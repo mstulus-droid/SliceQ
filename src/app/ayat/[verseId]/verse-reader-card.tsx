@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { parseNotes } from "@/lib/parse-notes";
+import { useNavigation } from "@/components/navigation-provider";
 
 type VerseReaderCardProps = {
   arabicText: string;
@@ -32,12 +33,14 @@ export function VerseReaderCard({
   nextVerseId,
 }: VerseReaderCardProps) {
   const router = useRouter();
+  const { startNavigation } = useNavigation();
 
   function goToVerse(targetVerseId: number | null) {
     if (!targetVerseId) {
       return;
     }
 
+    startNavigation();
     router.push(`/ayat/${targetVerseId}`);
   }
 

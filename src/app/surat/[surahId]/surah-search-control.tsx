@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { NavLink } from "@/components/nav-link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -221,7 +221,7 @@ export function SurahSearchControl({
         <div className="max-h-72 overflow-y-auto px-2 pb-2 pr-1 max-sm:max-h-[min(22rem,calc(100dvh-7rem))]">
           <div className="grid gap-2">
             {filteredSurahs.map((surah) => (
-              <Link
+              <NavLink
                 key={surah.id}
                 href={`/surat/${surah.id}`}
                 onClick={() => {
@@ -234,7 +234,7 @@ export function SurahSearchControl({
                   {surah.id}. {surah.nameLatin}
                 </p>
                 <p className="mt-1 text-xs text-slate-300">{surah.meaning}</p>
-              </Link>
+              </NavLink>
             ))}
           </div>
           {query.trim() && filteredSurahs.length === 0 ? (

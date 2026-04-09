@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { NavLink } from "@/components/nav-link";
 import { useEffect, useRef, useState } from "react";
 import { SurahJumpControl } from "./surah-jump-control";
 import { SurahSearchControl } from "./surah-search-control";
@@ -73,7 +73,7 @@ export function SurahFloatingControls({
           menuPosition="top"
           onOpenChange={(open) => setActiveMenu(open ? "search" : null)}
         />
-        <Link
+        <NavLink
           href="/"
           aria-label="Kembali ke home"
           title="Kembali ke home"
@@ -94,7 +94,7 @@ export function SurahFloatingControls({
               strokeLinejoin="round"
             />
           </svg>
-        </Link>
+        </NavLink>
         <SurahJumpControl
           verseCount={verseCount}
           label="Ke Ayat"

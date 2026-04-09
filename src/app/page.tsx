@@ -1,5 +1,5 @@
 import Image from "next/image";
-import Link from "next/link";
+import { NavLink } from "@/components/nav-link";
 import { redirect } from "next/navigation";
 import { DatabaseUnavailable } from "@/app/database-unavailable";
 import { HomeFooter } from "@/app/home-footer";
@@ -55,7 +55,7 @@ export default async function Home({ searchParams }: HomePageProps) {
       <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-4">
         <section className="px-1 pt-1">
           <div className="flex flex-col items-center justify-center gap-3 text-center">
-            <Link href="/" className="relative block h-[72px] w-[260px] sm:h-[88px] sm:w-[320px]">
+            <NavLink href="/" className="relative block h-[72px] w-[260px] sm:h-[88px] sm:w-[320px]">
               <Image
                 src="/brand/sliceq-samping.webp"
                 alt="SliceQ"
@@ -64,7 +64,7 @@ export default async function Home({ searchParams }: HomePageProps) {
                 sizes="(max-width: 640px) 260px, 320px"
                 className="object-contain"
               />
-            </Link>
+            </NavLink>
             <p className="max-w-xl text-sm leading-7 text-slate-600 sm:text-base">
               Sebuah arsip baca untuk tafsir, kritik, dan kontradiksi.
             </p>
@@ -82,7 +82,7 @@ export default async function Home({ searchParams }: HomePageProps) {
           list={
             <div className="divide-y divide-slate-200">
               {surahs.map((surah) => (
-                <Link
+                <NavLink
                   key={surah.id}
                   href={`/surat/${surah.id}`}
                   className="block px-4 py-3 transition hover:bg-[#f7f4ed] sm:px-5"
@@ -125,7 +125,7 @@ export default async function Home({ searchParams }: HomePageProps) {
                       </p>
                     </div>
                   </div>
-                </Link>
+                </NavLink>
               ))}
             </div>
           }
