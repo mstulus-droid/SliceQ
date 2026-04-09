@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { NavLink } from "@/components/nav-link";
+import { CommitInfoPopup } from "@/components/commit-info-popup";
 import { redirect } from "next/navigation";
 import { DatabaseUnavailable } from "@/app/database-unavailable";
 import { HomeFooter } from "@/app/home-footer";
@@ -55,16 +56,18 @@ export default async function Home({ searchParams }: HomePageProps) {
       <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-4">
         <section className="px-1 pt-1">
           <div className="flex flex-col items-center justify-center gap-3 text-center">
-            <NavLink href="/" className="relative block h-[72px] w-[260px] sm:h-[88px] sm:w-[320px]">
-              <Image
-                src="/brand/sliceq-samping.webp"
-                alt="SliceQ"
-                fill
-                priority
-                sizes="(max-width: 640px) 260px, 320px"
-                className="object-contain"
-              />
-            </NavLink>
+            <CommitInfoPopup>
+              <div className="relative block h-[72px] w-[260px] sm:h-[88px] sm:w-[320px]">
+                <Image
+                  src="/brand/sliceq-samping.webp"
+                  alt="SliceQ"
+                  fill
+                  priority
+                  sizes="(max-width: 640px) 260px, 320px"
+                  className="object-contain"
+                />
+              </div>
+            </CommitInfoPopup>
             <p className="max-w-xl text-sm leading-7 text-slate-600 sm:text-base">
               Sebuah arsip baca untuk tafsir, kritik, dan kontradiksi.
             </p>
