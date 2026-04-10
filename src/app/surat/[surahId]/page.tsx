@@ -273,17 +273,6 @@ export default async function SurahDetailPage({ params }: PageProps) {
                         ) : null}
                       </div>
 
-                      {verse.asbabunNuzul ? (
-                        <div className="mt-4 border-l-2 border-amber-300 pl-4">
-                          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-700">
-                            Asbabun Nuzul
-                          </p>
-                          <p className="mt-2 text-sm leading-7 text-slate-700">
-                            {verse.asbabunNuzul}
-                          </p>
-                        </div>
-                      ) : null}
-
                       <NavLink
                         href={`/ayat/${verse.id}`}
                         className="mt-5 block rounded-[1.4rem] bg-[linear-gradient(180deg,#faf8f1_0%,#ffffff_100%)] px-4 py-5 ring-1 ring-slate-200 transition hover:bg-slate-50"
@@ -295,6 +284,17 @@ export default async function SurahDetailPage({ params }: PageProps) {
                           {verse.translation}
                         </p>
                       </NavLink>
+
+                      {verse.asbabunNuzul ? (
+                        <div className="mt-4 border-l-2 border-amber-300 pl-4">
+                          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-700">
+                            Asbabun Nuzul
+                          </p>
+                          <p className="mt-2 text-sm leading-7 text-slate-700">
+                            {verse.asbabunNuzul}
+                          </p>
+                        </div>
+                      ) : null}
 
                       <VerseAnalysisDisclosures
                         critique={verse.critique}
