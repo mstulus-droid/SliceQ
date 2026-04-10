@@ -14,6 +14,7 @@ import { SurahFloatingControls } from "./surah-floating-controls";
 import { SurahJumpControl } from "./surah-jump-control";
 import { SurahSearchControl } from "./surah-search-control";
 import { SurahStickyTitle } from "./surah-sticky-title";
+import { SurahStatsPanel } from "./surah-stats-panel";
 import { SurahTopicPanel } from "./surah-topic-panel";
 import { VerseAnalysisDisclosures } from "./verse-analysis-disclosures";
 
@@ -222,11 +223,7 @@ export default async function SurahDetailPage({ params }: PageProps) {
             </div>
           </div>
 
-          <div className="rounded-[1.5rem] bg-white px-4 py-4 shadow-[0_20px_60px_-35px_rgba(15,23,42,0.28)] sm:px-5">
-            <p className="text-sm leading-7 text-slate-600">
-              Menampilkan semua ayat dari {surah.nameLatin}. Klik lafazh Arab untuk membuka detail ayat satu per satu.
-            </p>
-          </div>
+          <SurahStatsPanel verses={verses} surahNameLatin={surah.nameLatin} />
 
           <SurahTopicPanel
             topics={verseGroups

@@ -1,6 +1,6 @@
 export const GIT_INFO = {
-  "hash": "28ecd67",
-  "message": "trigger: rebuild after making repo public",
-  "date": "2026-04-09 17:13:27 +0700",
+  "hash": "cad4ad8",
+  "message": "v1.7",
+  "date": "2026-04-09 17:16:51 +0700",
   "branch": "main"
 };
