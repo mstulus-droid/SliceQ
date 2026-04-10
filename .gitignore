@@ -37,6 +37,9 @@ yarn-error.log*
 surat quran.xlsx
 ~$surat quran.xlsx
 
+# embeddings data (large files)
+public/embeddings/*.json
+
 # vercel
 .vercel
 
