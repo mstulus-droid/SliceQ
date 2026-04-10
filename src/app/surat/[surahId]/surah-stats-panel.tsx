@@ -61,7 +61,7 @@ export function SurahStatsPanel({ verses, surahNameLatin }: SurahStatsPanelProps
     },
     {
       key: "contradictions",
-      label: "Kontradiksi",
+      label: "Contradiction",
       count: contradictionsCount,
       color: "text-emerald-600",
       bgColor: "bg-emerald-50",

@@ -11,6 +11,7 @@ import {
   type VerseRecord,
   getSurahs,
   getVersesBySurahId,
+  getSurahsStats,
 } from "@/lib/quran-data";
 
 type HomePageProps = {
@@ -31,10 +32,12 @@ export default async function Home({ searchParams }: HomePageProps) {
   const hasSelectedAyah = Number.isFinite(selectedAyahNumber) && selectedAyahNumber > 0;
   let surahs: SurahListItem[];
   let ayahOptions: VerseRecord[] = [];
+  let surahStats = [];
   try {
-    [surahs, ayahOptions] = await Promise.all([
+    [surahs, ayahOptions, surahStats] = await Promise.all([
       getSurahs(),
       hasSelectedSurah ? getVersesBySurahId(selectedSurahId) : Promise.resolve([]),
+      getSurahsStats(),
     ]);
   } catch (error) {
     return <DatabaseUnavailable {...getDatabaseErrorInfo(error)} />;
@@ -56,7 +59,7 @@ export default async function Home({ searchParams }: HomePageProps) {
       <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-4">
         <section className="px-1 pt-1">
           <div className="flex flex-col items-center justify-center gap-3 text-center">
-            <CommitInfoPopup>
+            <CommitInfoPopup surahStats={surahStats}>
               <div className="relative block h-[72px] w-[260px] sm:h-[88px] sm:w-[320px]">
                 <Image
                   src="/brand/sliceq-samping.webp"

@@ -35,6 +35,16 @@ export type HomeStats = {
   analysisCount: number;
 };
 
+export type SurahStats = {
+  id: number;
+  nameLatin: string;
+  verseCount: number;
+  logicalFallaciesPercent: number;
+  scientificErrorsPercent: number;
+  moralConcernsPercent: number;
+  contradictionsPercent: number;
+};
+
 export type SearchFilters = {
   query?: string;
   place?: string;
@@ -147,6 +157,51 @@ export async function getHomeStats(): Promise<HomeStats> {
     verseCount: result.rows[0].verse_count,
     analysisCount: result.rows[0].analysis_count,
   };
+}
+
+export async function getSurahsStats(): Promise<SurahStats[]> {
+  const pool = getPool();
+  const result = await pool.query<{
+    id: number;
+    name_latin: string;
+    verse_count: number;
+    logical_fallacies_count: number;
+    scientific_errors_count: number;
+    moral_concerns_count: number;
+    contradictions_count: number;
+  }>(`
+    select
+      s.id,
+      s.name_latin,
+      s.verse_count,
+      count(*) filter (where coalesce(a.logical_fallacies, '') <> '') as logical_fallacies_count,
+      count(*) filter (where coalesce(a.scientific_errors, '') <> '') as scientific_errors_count,
+      count(*) filter (where coalesce(a.moral_concerns, '') <> '') as moral_concerns_count,
+      count(*) filter (where coalesce(a.contradictions, '') <> '') as contradictions_count
+    from surahs s
+    left join verses v on v.surah_id = s.id
+    left join verse_analyses a on a.verse_id = v.id
+    group by s.id, s.name_latin, s.verse_count
+    order by s.id
+  `);
+
+  return result.rows.map((row) => ({
+    id: row.id,
+    nameLatin: row.name_latin,
+    verseCount: row.verse_count,
+    logicalFallaciesPercent: row.verse_count > 0 
+      ? Math.round((row.logical_fallacies_count / row.verse_count) * 100) 
+      : 0,
+    scientificErrorsPercent: row.verse_count > 0 
+      ? Math.round((row.scientific_errors_count / row.verse_count) * 100) 
+      : 0,
+    moralConcernsPercent: row.verse_count > 0 
+      ? Math.round((row.moral_concerns_count / row.verse_count) * 100) 
+      : 0,
+    contradictionsPercent: row.verse_count > 0 
+      ? Math.round((row.contradictions_count / row.verse_count) * 100) 
+      : 0,
+  }));
 }
 
 export async function getSurahs(limit?: number): Promise<SurahListItem[]> {

@@ -1,6 +1,6 @@
 "use server";
 
-import { VerseRecord, searchVersesWithFilters } from "@/lib/quran-data";
+import { VerseRecord, searchVersesWithFilters, getVerseById } from "@/lib/quran-data";
 
 function countMatches(text: string, query: string): number {
   if (!query || !text) return 0;
@@ -67,4 +67,23 @@ export async function searchVersesAction(query: string): Promise<VerseRecord[]> 
   });
 
   return deduped.map((s) => s.verse);
+}
+
+/**
+ * Fetch full verse details by IDs (used for semantic search results)
+ */
+export async function getVersesByIds(ids: number[]): Promise<VerseRecord[]> {
+  const verses: VerseRecord[] = [];
+  
+  // Fetch in parallel with limited concurrency
+  const batchSize = 10;
+  for (let i = 0; i < ids.length; i += batchSize) {
+    const batch = ids.slice(i, i + batchSize);
+    const batchResults = await Promise.all(
+      batch.map((id) => getVerseById(id))
+    );
+    verses.push(...batchResults.filter((v): v is VerseRecord => v !== null));
+  }
+  
+  return verses;
 }
