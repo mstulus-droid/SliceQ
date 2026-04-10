@@ -1,15 +1,14 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import {
-  initializeSemanticSearch,
-  isSemanticSearchReady,
-  semanticSearch,
-  getSemanticSearchStatus,
-  VerseEmbedding,
-  clearSemanticSearchCache,
-} from "./semantic-search";
 
+// Dynamic import to avoid SSR issues with Transformers.js
+async function loadSemanticSearch() {
+  const mod = await import("./semantic-search");
+  return mod;
+}
+
+// Re-export types
 export type SearchMode = "keyword" | "semantic" | "hybrid";
 
 export type SearchResult = {
@@ -43,6 +42,7 @@ export function useSemanticSearch(options: UseSemanticSearchOptions = {}) {
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [verseCount, setVerseCount] = useState(0);
+  const [isReady, setIsReady] = useState(false);
   
   const initialized = useRef(false);
   const initTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -50,6 +50,7 @@ export function useSemanticSearch(options: UseSemanticSearchOptions = {}) {
   // Initialize semantic search after idle delay
   useEffect(() => {
     if (!autoInitialize || initialized.current) return;
+    if (typeof window === "undefined") return; // Skip on SSR
     
     // Wait for idle time before starting download
     initTimeoutRef.current = setTimeout(() => {
@@ -65,24 +66,32 @@ export function useSemanticSearch(options: UseSemanticSearchOptions = {}) {
 
   const startInitialization = useCallback(async () => {
     if (initialized.current || isInitializing) return;
+    if (typeof window === "undefined") return; // Skip on SSR
     
     setIsInitializing(true);
     setProgress(10);
     
     try {
-      await initializeSemanticSearch();
+      const semanticSearch = await loadSemanticSearch();
+      await semanticSearch.initializeSemanticSearch();
       
-      const status = getSemanticSearchStatus();
+      const status = semanticSearch.getSemanticSearchStatus();
       setVerseCount(status.verseCount);
-      setMode("semantic");
+      setIsReady(status.ready);
+      
+      if (status.ready) {
+        setMode("semantic");
+      }
+      
       setProgress(100);
       initialized.current = true;
       
-      console.log("[useSemanticSearch] Semantic search ready!");
+      console.log("[useSemanticSearch] Semantic search status:", status.ready ? "ready" : "not ready");
     } catch (err) {
       console.error("[useSemanticSearch] Initialization failed:", err);
       setError("Gagal memuat pencarian pintar");
       setMode("keyword");
+      setIsReady(false);
     } finally {
       setIsInitializing(false);
     }
@@ -108,20 +117,27 @@ export function useSemanticSearch(options: UseSemanticSearchOptions = {}) {
     setError(null);
     
     try {
+      // Load semantic search module
+      const semanticSearch = await loadSemanticSearch();
+      
       // If semantic is ready, use it
-      if (mode === "semantic" && isSemanticSearchReady()) {
+      if (isReady && semanticSearch.isSemanticSearchReady()) {
         console.log("[useSemanticSearch] Using semantic search");
-        const semanticResults = await semanticSearch(query, 30);
+        const semanticResults = await semanticSearch.semanticSearch(query, 30);
         
-        return semanticResults.map((result) => ({
-          id: result.verse.id,
-          surahId: result.verse.surahId,
-          ayahNumber: result.verse.ayahNumber,
-          surahNameIndonesian: result.verse.surahNameIndonesian,
-          score: result.score,
-          // These will be fetched from server when needed
-          // For now we return basic info
-        }));
+        // If we got semantic results (they have score), fetch full details
+        const hasScores = semanticResults.length > 0;
+        
+        if (hasScores) {
+          // Return results with scores
+          return semanticResults.map((result) => ({
+            id: result.verse.id,
+            surahId: result.verse.surahId,
+            ayahNumber: result.verse.ayahNumber,
+            surahNameIndonesian: result.verse.surahNameIndonesian,
+            score: result.score,
+          }));
+        }
       }
       
       // Fallback to keyword search
@@ -136,14 +152,16 @@ export function useSemanticSearch(options: UseSemanticSearchOptions = {}) {
     } finally {
       setIsLoading(false);
     }
-  }, [mode]);
+  }, [isReady]);
 
   // Clear cache and reinitialize
   const reset = useCallback(async () => {
-    await clearSemanticSearchCache();
+    const semanticSearch = await loadSemanticSearch();
+    await semanticSearch.clearSemanticSearchCache();
     initialized.current = false;
     setMode("keyword");
     setVerseCount(0);
+    setIsReady(false);
     setProgress(0);
     await initialize();
   }, [initialize]);
@@ -155,7 +173,7 @@ export function useSemanticSearch(options: UseSemanticSearchOptions = {}) {
     progress,
     error,
     verseCount,
-    isReady: isSemanticSearchReady(),
+    isReady,
     search,
     initialize,
     reset,

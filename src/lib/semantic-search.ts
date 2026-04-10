@@ -8,8 +8,6 @@
  * - Fallback to keyword search
  */
 
-import { pipeline, FeatureExtractionPipeline } from "@xenova/transformers";
-
 // Using all-MiniLM-L6-v2: 384 dimensions, good balance of speed/quality
 const MODEL_NAME = "Xenova/all-MiniLM-L6-v2";
 const EMBEDDINGS_URL = "/embeddings/verses-embeddings.json";
@@ -39,14 +37,24 @@ type SemanticSearchResult = {
   score: number;
 };
 
+// Dynamic import type
+type Pipeline = import("@xenova/transformers").FeatureExtractionPipeline;
+
 // Singleton state
-let embedder: FeatureExtractionPipeline | null = null;
+let embedder: Pipeline | null = null;
 let embeddingsData: EmbeddingsData | null = null;
 let isLoading = false;
 let loadingPromise: Promise<void> | null = null;
 
+// Check if we're in browser
+const isBrowser = typeof window !== "undefined" && typeof indexedDB !== "undefined";
+
 // IndexedDB helpers
 async function openDB(): Promise<IDBDatabase> {
+  if (!isBrowser) {
+    throw new Error("IndexedDB only available in browser");
+  }
+  
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
     
@@ -63,18 +71,26 @@ async function openDB(): Promise<IDBDatabase> {
 }
 
 async function saveToIndexedDB(key: string, data: unknown): Promise<void> {
-  const db = await openDB();
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction([STORE_NAME], "readwrite");
-    const store = transaction.objectStore(STORE_NAME);
-    const request = store.put(data, key);
-    
-    request.onsuccess = () => resolve();
-    request.onerror = () => reject(request.error);
-  });
+  if (!isBrowser) return;
+  
+  try {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction([STORE_NAME], "readwrite");
+      const store = transaction.objectStore(STORE_NAME);
+      const request = store.put(data, key);
+      
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  } catch {
+    // Silently fail
+  }
 }
 
 async function loadFromIndexedDB(key: string): Promise<unknown | null> {
+  if (!isBrowser) return null;
+  
   try {
     const db = await openDB();
     return new Promise((resolve, reject) => {
@@ -93,10 +109,12 @@ async function loadFromIndexedDB(key: string): Promise<unknown | null> {
 // Load embeddings from network or cache
 async function loadEmbeddings(): Promise<EmbeddingsData> {
   // Try IndexedDB first
-  const cached = await loadFromIndexedDB("embeddings-data");
-  if (cached) {
-    console.log("[SemanticSearch] Loaded embeddings from IndexedDB cache");
-    return cached as EmbeddingsData;
+  if (isBrowser) {
+    const cached = await loadFromIndexedDB("embeddings-data");
+    if (cached) {
+      console.log("[SemanticSearch] Loaded embeddings from IndexedDB cache");
+      return cached as EmbeddingsData;
+    }
   }
 
   // Fetch from network
@@ -109,32 +127,44 @@ async function loadEmbeddings(): Promise<EmbeddingsData> {
   const data = await response.json() as EmbeddingsData;
   
   // Save to IndexedDB for next time
-  try {
-    await saveToIndexedDB("embeddings-data", data);
-    console.log("[SemanticSearch] Saved embeddings to IndexedDB cache");
-  } catch (err) {
-    console.warn("[SemanticSearch] Failed to cache embeddings:", err);
+  if (isBrowser) {
+    try {
+      await saveToIndexedDB("embeddings-data", data);
+      console.log("[SemanticSearch] Saved embeddings to IndexedDB cache");
+    } catch (err) {
+      console.warn("[SemanticSearch] Failed to cache embeddings:", err);
+    }
   }
   
   return data;
 }
 
 // Load the embedding model
-async function loadModel(): Promise<FeatureExtractionPipeline> {
-  if (embedder) return embedder;
+async function loadModel(): Promise<Pipeline> {
+  if (!isBrowser) {
+    throw new Error("Model loading only available in browser");
+  }
+  
+  // Dynamic import to avoid SSR issues
+  const { pipeline } = await import("@xenova/transformers");
   
   console.log("[SemanticSearch] Loading model...", MODEL_NAME);
-  embedder = await pipeline("feature-extraction", MODEL_NAME, {
+  const model = await pipeline("feature-extraction", MODEL_NAME, {
     quantized: true, // Use quantized model for smaller size
     revision: "main",
   });
   console.log("[SemanticSearch] Model loaded");
   
-  return embedder;
+  return model;
 }
 
 // Main initialization function
 export async function initializeSemanticSearch(): Promise<void> {
+  if (!isBrowser) {
+    console.log("[SemanticSearch] Skipped - not in browser");
+    return;
+  }
+  
   if (embeddingsData && embedder) {
     return; // Already initialized
   }
@@ -146,19 +176,28 @@ export async function initializeSemanticSearch(): Promise<void> {
   isLoading = true;
   loadingPromise = (async () => {
     try {
-      // Load both in parallel
-      const [model, embeddings] = await Promise.all([
-        loadModel(),
-        loadEmbeddings(),
-      ]);
+      // Load embeddings first
+      const embeddings = await loadEmbeddings();
       
-      embedder = model;
+      // Check if embeddings have data
+      if (!embeddings.count || embeddings.count === 0 || embeddings.verses.length === 0) {
+        console.log("[SemanticSearch] No embeddings data available, skipping model load");
+        embeddingsData = null;
+        return;
+      }
+      
       embeddingsData = embeddings;
+      
+      // Then load model
+      const model = await loadModel();
+      embedder = model;
       
       console.log(`[SemanticSearch] Ready! ${embeddings.count} verses indexed`);
     } catch (err) {
       console.error("[SemanticSearch] Initialization failed:", err);
-      throw err;
+      // Don't throw - just mark as not ready
+      embeddingsData = null;
+      embedder = null;
     } finally {
       isLoading = false;
     }
@@ -169,7 +208,8 @@ export async function initializeSemanticSearch(): Promise<void> {
 
 // Check if semantic search is ready
 export function isSemanticSearchReady(): boolean {
-  return embeddingsData !== null && 
+  return isBrowser && 
+         embeddingsData !== null && 
          embedder !== null && 
          embeddingsData.count > 0 &&
          embeddingsData.verses.length > 0;
@@ -231,6 +271,8 @@ export async function semanticSearch(
 
 // Clear cache (useful for debugging or force refresh)
 export async function clearSemanticSearchCache(): Promise<void> {
+  if (!isBrowser) return;
+  
   try {
     const db = await openDB();
     const transaction = db.transaction([STORE_NAME], "readwrite");
