@@ -2,7 +2,6 @@
 
 import { useMemo, useRef, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { SearchMode } from "@/lib/use-semantic-search";
 
 type SurahOption = {
   id: number;
@@ -19,13 +18,7 @@ type HomeControlsProps = {
   onSearch?: (query: string) => void;
   onResetSearch?: () => void;
   isSearching?: boolean;
-  // Semantic search props
-  searchMode?: SearchMode;
-  isSemanticInitializing?: boolean;
-  isSemanticReady?: boolean;
-  semanticVerseCount?: number;
-  semanticError?: string | null;
-  onRefreshSemantic?: () => void;
+
 };
 
 export function HomeControls({
@@ -37,12 +30,7 @@ export function HomeControls({
   onSearch,
   onResetSearch,
   isSearching,
-  searchMode = "keyword",
-  isSemanticInitializing = false,
-  isSemanticReady = false,
-  semanticVerseCount = 0,
-  semanticError = null,
-  onRefreshSemantic,
+
 }: HomeControlsProps) {
   const router = useRouter();
   const [surahQuery, setSurahQuery] = useState(selectedSurah);
@@ -177,51 +165,6 @@ export function HomeControls({
           onSubmit={handleSearchSubmit}
           className="mt-4 rounded-[1.5rem] bg-[#171717] p-4 text-white shadow-[0_18px_50px_-36px_rgba(15,23,42,0.8)]"
         >
-          {/* Search Status Indicator */}
-          <div className="mb-3 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              {isSemanticInitializing ? (
-                <>
-                  <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-amber-400"></span>
-                  <span className="text-xs text-amber-400">
-                    Memuat AI...
-                  </span>
-                </>
-              ) : isSemanticReady ? (
-                <>
-                  <span className="inline-block h-2 w-2 rounded-full bg-emerald-400"></span>
-                  <span className="text-xs text-emerald-400">
-                    Pencarian Semantic
-                  </span>
-                </>
-              ) : semanticError ? (
-                <>
-                  <span className="inline-block h-2 w-2 rounded-full bg-red-400"></span>
-                  <span className="text-xs text-red-400" title={semanticError}>
-                    AI Error
-                  </span>
-                </>
-              ) : (
-                <>
-                  <span className="inline-block h-2 w-2 rounded-full bg-slate-400"></span>
-                  <span className="text-xs text-slate-400">
-                    Pencarian
-                  </span>
-                </>
-              )}
-            </div>
-            {!isSemanticReady && !isSemanticInitializing && onRefreshSemantic && (
-              <button
-                type="button"
-                onClick={onRefreshSemantic}
-                className="text-[10px] text-slate-400 hover:text-emerald-600 underline"
-                title="Refresh data AI"
-              >
-                Refresh AI
-              </button>
-            )}
-          </div>
-
           <div className="flex flex-col gap-3 sm:flex-row">
             <div className="flex min-w-0 flex-1 items-center gap-2 rounded-[1rem] bg-white px-4 py-3">
               <input
