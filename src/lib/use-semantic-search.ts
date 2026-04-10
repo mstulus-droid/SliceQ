@@ -62,6 +62,7 @@ export function useSemanticSearch(options: UseSemanticSearchOptions = {}) {
         clearTimeout(initTimeoutRef.current);
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoInitialize, idleDelay]);
 
   const startInitialization = useCallback(async () => {

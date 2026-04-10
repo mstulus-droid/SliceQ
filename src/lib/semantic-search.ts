@@ -126,6 +126,12 @@ async function loadEmbeddings(): Promise<EmbeddingsData> {
   
   const data = await response.json() as EmbeddingsData;
   
+  // Check if data is empty - throw early to avoid loading model
+  if (!data.count || data.count === 0 || !data.verses || data.verses.length === 0) {
+    console.log("[SemanticSearch] Embeddings file is empty, semantic search disabled");
+    throw new Error("EMPTY_EMBEDDINGS");
+  }
+  
   // Save to IndexedDB for next time
   if (isBrowser) {
     try {
@@ -158,6 +164,21 @@ async function loadModel(): Promise<Pipeline> {
   return model;
 }
 
+// Quick check if embeddings file has data (before loading model)
+async function checkEmbeddingsAvailable(): Promise<boolean> {
+  try {
+    const response = await fetch(EMBEDDINGS_URL, { method: "HEAD" });
+    if (!response.ok) return false;
+    
+    // Try to load just the count from file
+    const responseFull = await fetch(EMBEDDINGS_URL);
+    const data = await responseFull.json() as EmbeddingsData;
+    return data.count > 0 && data.verses.length > 0;
+  } catch {
+    return false;
+  }
+}
+
 // Main initialization function
 export async function initializeSemanticSearch(): Promise<void> {
   if (!isBrowser) {
@@ -176,16 +197,15 @@ export async function initializeSemanticSearch(): Promise<void> {
   isLoading = true;
   loadingPromise = (async () => {
     try {
-      // Load embeddings first
-      const embeddings = await loadEmbeddings();
-      
-      // Check if embeddings have data
-      if (!embeddings.count || embeddings.count === 0 || embeddings.verses.length === 0) {
-        console.log("[SemanticSearch] No embeddings data available, skipping model load");
-        embeddingsData = null;
+      // Quick check first - avoid loading model if no data
+      const hasData = await checkEmbeddingsAvailable();
+      if (!hasData) {
+        console.log("[SemanticSearch] No embeddings data available, skipping initialization");
         return;
       }
       
+      // Load embeddings
+      const embeddings = await loadEmbeddings();
       embeddingsData = embeddings;
       
       // Then load model
@@ -194,7 +214,12 @@ export async function initializeSemanticSearch(): Promise<void> {
       
       console.log(`[SemanticSearch] Ready! ${embeddings.count} verses indexed`);
     } catch (err) {
-      console.error("[SemanticSearch] Initialization failed:", err);
+      const errorMsg = err instanceof Error ? err.message : String(err);
+      if (errorMsg === "EMPTY_EMBEDDINGS") {
+        console.log("[SemanticSearch] Embeddings empty, using keyword search only");
+      } else {
+        console.error("[SemanticSearch] Initialization failed:", err);
+      }
       // Don't throw - just mark as not ready
       embeddingsData = null;
       embedder = null;

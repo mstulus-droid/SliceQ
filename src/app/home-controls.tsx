@@ -190,6 +190,13 @@ export function HomeControls({
                     AI search aktif ({semanticVerseCount.toLocaleString()} ayat)
                   </span>
                 </>
+              ) : semanticVerseCount === 0 ? (
+                <>
+                  <span className="inline-block h-2 w-2 rounded-full bg-slate-400"></span>
+                  <span className="text-xs text-slate-400" title="Data embeddings belum tersedia">
+                    Pencarian standar (data AI belum tersedia)
+                  </span>
+                </>
               ) : (
                 <>
                   <span className="inline-block h-2 w-2 rounded-full bg-slate-400"></span>
