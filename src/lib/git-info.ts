@@ -1,6 +1,6 @@
 export const GIT_INFO = {
-  "hash": "9f094a0",
-  "message": "debug: tambah logging detail dan error handling untuk AI search\n\n- Tambah console log di setiap step load embeddings\n- Tampilkan error message di UI kalau AI gagal load\n- Update status text saat loading: 'Memuat AI...'",
-  "date": "2026-04-11 00:17:43 +0700",
+  "hash": "4776da6",
+  "message": "debug: tambah extensive logging untuk diagnosis AI error\n\n- Log setiap step initialization\n- Tampilkan error detail di console\n- Re-throw error agar hook bisa tangkap",
+  "date": "2026-04-11 00:22:22 +0700",
   "branch": "main"
 };

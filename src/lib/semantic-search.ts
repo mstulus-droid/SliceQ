@@ -16,7 +16,16 @@ const DB_VERSION = 2; // Increment to force cache refresh
 
 // Version-based cache busting - update this when embeddings change
 const EMBEDDINGS_VERSION = "v2-full-6236";
-const EMBEDDINGS_URL = `/embeddings/verses-embeddings.json?version=${EMBEDDINGS_VERSION}`;
+
+// Get absolute URL for embeddings (works on both dev and production)
+function getEmbeddingsUrl(): string {
+  if (typeof window === "undefined") {
+    return `/embeddings/verses-embeddings.json?version=${EMBEDDINGS_VERSION}`;
+  }
+  // Use absolute URL to avoid issues with Vercel
+  const baseUrl = window.location.origin;
+  return `${baseUrl}/embeddings/verses-embeddings.json?version=${EMBEDDINGS_VERSION}`;
+}
 
 export type VerseEmbedding = {
   id: number;
@@ -126,10 +135,11 @@ async function loadEmbeddings(): Promise<EmbeddingsData> {
   }
 
   // Fetch from network
+  const url = getEmbeddingsUrl();
   console.log("[SemanticSearch] Fetching embeddings from server...");
-  console.log(`[SemanticSearch] URL: ${EMBEDDINGS_URL}`);
+  console.log(`[SemanticSearch] URL: ${url}`);
   
-  const response = await fetch(EMBEDDINGS_URL);
+  const response = await fetch(url);
   console.log(`[SemanticSearch] Response status: ${response.status}`);
   
   if (!response.ok) {
@@ -166,27 +176,34 @@ async function loadModel(): Promise<Pipeline> {
     throw new Error("Model loading only available in browser");
   }
   
-  // Dynamic import to avoid SSR issues
-  const { pipeline } = await import("@xenova/transformers");
-  
-  console.log("[SemanticSearch] Loading model...", MODEL_NAME);
-  const model = await pipeline("feature-extraction", MODEL_NAME, {
-    quantized: true, // Use quantized model for smaller size
-    revision: "main",
-  });
-  console.log("[SemanticSearch] Model loaded");
-  
-  return model;
+  try {
+    // Dynamic import to avoid SSR issues
+    console.log("[SemanticSearch] Importing Transformers.js...");
+    const { pipeline } = await import("@xenova/transformers");
+    
+    console.log("[SemanticSearch] Loading model:", MODEL_NAME);
+    const model = await pipeline("feature-extraction", MODEL_NAME, {
+      quantized: true, // Use quantized model for smaller size
+      revision: "main",
+    });
+    console.log("[SemanticSearch] Model loaded successfully");
+    
+    return model;
+  } catch (err) {
+    console.error("[SemanticSearch] Failed to load model:", err);
+    throw new Error(`Model load failed: ${err instanceof Error ? err.message : String(err)}`);
+  }
 }
 
 // Quick check if embeddings file has data (before loading model)
 async function checkEmbeddingsAvailable(): Promise<boolean> {
   try {
+    const url = getEmbeddingsUrl();
     console.log("[SemanticSearch] Checking if embeddings available...");
-    console.log(`[SemanticSearch] URL: ${EMBEDDINGS_URL}`);
+    console.log(`[SemanticSearch] URL: ${url}`);
     
-    const response = await fetch(EMBEDDINGS_URL);
-    console.log(`[SemanticSearch] HEAD response: ${response.status}`);
+    const response = await fetch(url);
+    console.log(`[SemanticSearch] Response status: ${response.status}`);
     
     if (!response.ok) {
       console.error(`[SemanticSearch] HTTP error: ${response.status}`);
