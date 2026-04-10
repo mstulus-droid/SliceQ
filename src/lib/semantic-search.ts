@@ -10,10 +10,13 @@
 
 // Using all-MiniLM-L6-v2: 384 dimensions, good balance of speed/quality
 const MODEL_NAME = "Xenova/all-MiniLM-L6-v2";
-const EMBEDDINGS_URL = "/embeddings/verses-embeddings.json";
 const DB_NAME = "SliceQSemanticSearch";
 const STORE_NAME = "embeddings";
-const DB_VERSION = 1;
+const DB_VERSION = 2; // Increment to force cache refresh
+
+// Version-based cache busting - update this when embeddings change
+const EMBEDDINGS_VERSION = "v2-full-6236";
+const EMBEDDINGS_URL = `/embeddings/verses-embeddings.json?version=${EMBEDDINGS_VERSION}`;
 
 export type VerseEmbedding = {
   id: number;

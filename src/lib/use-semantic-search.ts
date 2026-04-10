@@ -167,6 +167,19 @@ export function useSemanticSearch(options: UseSemanticSearchOptions = {}) {
     await initialize();
   }, [initialize]);
 
+  // Force refresh - clear IndexedDB cache and reload from server
+  const refresh = useCallback(async () => {
+    console.log("[useSemanticSearch] Force refreshing AI data...");
+    const semanticSearch = await loadSemanticSearch();
+    await semanticSearch.clearSemanticSearchCache();
+    initialized.current = false;
+    setMode("keyword");
+    setVerseCount(0);
+    setIsReady(false);
+    setProgress(0);
+    await startInitialization();
+  }, [startInitialization]);
+
   return {
     mode,
     isLoading,
@@ -178,5 +191,6 @@ export function useSemanticSearch(options: UseSemanticSearchOptions = {}) {
     search,
     initialize,
     reset,
+    refresh,
   };
 }

@@ -75,6 +75,7 @@ export function HomeClientWrapper({
     isReady: isSemanticReady,
     verseCount: semanticVerseCount,
     search: semanticSearch,
+    refresh: refreshSemantic,
   } = useSemanticSearch({ autoInitialize: true, idleDelay: 3000 });
 
   const handleSearch = useCallback(async (q: string) => {
@@ -162,6 +163,7 @@ export function HomeClientWrapper({
             isSemanticInitializing={isSemanticInitializing}
             isSemanticReady={isSemanticReady}
             semanticVerseCount={semanticVerseCount}
+            onRefreshSemantic={refreshSemantic}
           />
         }
         list={list}

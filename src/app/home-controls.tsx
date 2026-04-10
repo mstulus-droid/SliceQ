@@ -24,6 +24,7 @@ type HomeControlsProps = {
   isSemanticInitializing?: boolean;
   isSemanticReady?: boolean;
   semanticVerseCount?: number;
+  onRefreshSemantic?: () => void;
 };
 
 export function HomeControls({
@@ -39,6 +40,7 @@ export function HomeControls({
   isSemanticInitializing = false,
   isSemanticReady = false,
   semanticVerseCount = 0,
+  onRefreshSemantic,
 }: HomeControlsProps) {
   const router = useRouter();
   const [surahQuery, setSurahQuery] = useState(selectedSurah);
@@ -206,6 +208,16 @@ export function HomeControls({
                 </>
               )}
             </div>
+            {!isSemanticReady && !isSemanticInitializing && onRefreshSemantic && (
+              <button
+                type="button"
+                onClick={onRefreshSemantic}
+                className="text-[10px] text-slate-400 hover:text-emerald-600 underline"
+                title="Refresh data AI"
+              >
+                Refresh AI
+              </button>
+            )}
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row">
