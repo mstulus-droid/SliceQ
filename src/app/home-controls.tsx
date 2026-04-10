@@ -175,35 +175,28 @@ export function HomeControls({
           onSubmit={handleSearchSubmit}
           className="mt-4 rounded-[1.5rem] bg-[#171717] p-4 text-white shadow-[0_18px_50px_-36px_rgba(15,23,42,0.8)]"
         >
-          {/* Semantic Search Status Indicator */}
+          {/* Search Status Indicator */}
           <div className="mb-3 flex items-center justify-between">
             <div className="flex items-center gap-2">
               {isSemanticInitializing ? (
                 <>
                   <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-amber-400"></span>
                   <span className="text-xs text-amber-400">
-                    Memuat AI search...
+                    Pencarian
                   </span>
                 </>
               ) : isSemanticReady ? (
                 <>
                   <span className="inline-block h-2 w-2 rounded-full bg-emerald-400"></span>
                   <span className="text-xs text-emerald-400">
-                    AI search aktif ({semanticVerseCount.toLocaleString()} ayat)
-                  </span>
-                </>
-              ) : semanticVerseCount === 0 ? (
-                <>
-                  <span className="inline-block h-2 w-2 rounded-full bg-slate-400"></span>
-                  <span className="text-xs text-slate-400" title="Data embeddings belum tersedia">
-                    Pencarian standar (data AI belum tersedia)
+                    Pencarian Semantic
                   </span>
                 </>
               ) : (
                 <>
                   <span className="inline-block h-2 w-2 rounded-full bg-slate-400"></span>
                   <span className="text-xs text-slate-400">
-                    Pencarian standar
+                    Pencarian
                   </span>
                 </>
               )}
