@@ -70,6 +70,7 @@ export function useSemanticSearch(options: UseSemanticSearchOptions = {}) {
     if (typeof window === "undefined") return; // Skip on SSR
     
     setIsInitializing(true);
+    setError(null);
     setProgress(10);
     
     try {
@@ -82,15 +83,20 @@ export function useSemanticSearch(options: UseSemanticSearchOptions = {}) {
       
       if (status.ready) {
         setMode("semantic");
+        console.log("[useSemanticSearch] ✅ AI Ready!");
+      } else {
+        console.log("[useSemanticSearch] ⚠️ AI not ready - embeddings empty or failed");
+        if (status.verseCount === 0) {
+          setError("Data AI tidak tersedia. Silakan refresh halaman.");
+        }
       }
       
       setProgress(100);
       initialized.current = true;
-      
-      console.log("[useSemanticSearch] Semantic search status:", status.ready ? "ready" : "not ready");
     } catch (err) {
-      console.error("[useSemanticSearch] Initialization failed:", err);
-      setError("Gagal memuat pencarian pintar");
+      console.error("[useSemanticSearch] ❌ Initialization failed:", err);
+      const errorMsg = err instanceof Error ? err.message : String(err);
+      setError(`Gagal memuat AI: ${errorMsg}`);
       setMode("keyword");
       setIsReady(false);
     } finally {

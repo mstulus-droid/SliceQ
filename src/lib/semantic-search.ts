@@ -113,21 +113,31 @@ async function loadFromIndexedDB(key: string): Promise<unknown | null> {
 async function loadEmbeddings(): Promise<EmbeddingsData> {
   // Try IndexedDB first
   if (isBrowser) {
+    console.log("[SemanticSearch] Checking IndexedDB cache...");
     const cached = await loadFromIndexedDB("embeddings-data");
     if (cached) {
-      console.log("[SemanticSearch] Loaded embeddings from IndexedDB cache");
-      return cached as EmbeddingsData;
+      const cachedData = cached as EmbeddingsData;
+      console.log(`[SemanticSearch] Loaded from IndexedDB: ${cachedData.count} verses`);
+      if (cachedData.count > 0) {
+        return cachedData;
+      }
+      console.log("[SemanticSearch] IndexedDB cache empty, fetching fresh...");
     }
   }
 
   // Fetch from network
   console.log("[SemanticSearch] Fetching embeddings from server...");
+  console.log(`[SemanticSearch] URL: ${EMBEDDINGS_URL}`);
+  
   const response = await fetch(EMBEDDINGS_URL);
+  console.log(`[SemanticSearch] Response status: ${response.status}`);
+  
   if (!response.ok) {
     throw new Error(`Failed to load embeddings: ${response.status}`);
   }
   
   const data = await response.json() as EmbeddingsData;
+  console.log(`[SemanticSearch] Fetched data: ${data.count} verses, ${data.verses?.length || 0} in array`);
   
   // Check if data is empty - throw early to avoid loading model
   if (!data.count || data.count === 0 || !data.verses || data.verses.length === 0) {
@@ -138,10 +148,12 @@ async function loadEmbeddings(): Promise<EmbeddingsData> {
   // Save to IndexedDB for next time
   if (isBrowser) {
     try {
+      console.log("[SemanticSearch] Saving to IndexedDB...");
       await saveToIndexedDB("embeddings-data", data);
-      console.log("[SemanticSearch] Saved embeddings to IndexedDB cache");
+      console.log("[SemanticSearch] Saved to IndexedDB successfully");
     } catch (err) {
-      console.warn("[SemanticSearch] Failed to cache embeddings:", err);
+      console.error("[SemanticSearch] Failed to cache to IndexedDB:", err);
+      // Continue even if cache fails - we can still use the data
     }
   }
   

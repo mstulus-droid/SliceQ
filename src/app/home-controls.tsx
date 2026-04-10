@@ -24,6 +24,7 @@ type HomeControlsProps = {
   isSemanticInitializing?: boolean;
   isSemanticReady?: boolean;
   semanticVerseCount?: number;
+  semanticError?: string | null;
   onRefreshSemantic?: () => void;
 };
 
@@ -40,6 +41,7 @@ export function HomeControls({
   isSemanticInitializing = false,
   isSemanticReady = false,
   semanticVerseCount = 0,
+  semanticError = null,
   onRefreshSemantic,
 }: HomeControlsProps) {
   const router = useRouter();
@@ -182,7 +184,7 @@ export function HomeControls({
                 <>
                   <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-amber-400"></span>
                   <span className="text-xs text-amber-400">
-                    Pencarian
+                    Memuat AI...
                   </span>
                 </>
               ) : isSemanticReady ? (
@@ -190,6 +192,13 @@ export function HomeControls({
                   <span className="inline-block h-2 w-2 rounded-full bg-emerald-400"></span>
                   <span className="text-xs text-emerald-400">
                     Pencarian Semantic
+                  </span>
+                </>
+              ) : semanticError ? (
+                <>
+                  <span className="inline-block h-2 w-2 rounded-full bg-red-400"></span>
+                  <span className="text-xs text-red-400" title={semanticError}>
+                    AI Error
                   </span>
                 </>
               ) : (

@@ -74,6 +74,7 @@ export function HomeClientWrapper({
     isInitializing: isSemanticInitializing,
     isReady: isSemanticReady,
     verseCount: semanticVerseCount,
+    error: semanticError,
     search: semanticSearch,
     refresh: refreshSemantic,
   } = useSemanticSearch({ autoInitialize: true, idleDelay: 3000 });
@@ -163,6 +164,7 @@ export function HomeClientWrapper({
             isSemanticInitializing={isSemanticInitializing}
             isSemanticReady={isSemanticReady}
             semanticVerseCount={semanticVerseCount}
+            semanticError={semanticError}
             onRefreshSemantic={refreshSemantic}
           />
         }
