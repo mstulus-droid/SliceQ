@@ -66,18 +66,36 @@ export function useSemanticSearch(options: UseSemanticSearchOptions = {}) {
   }, [autoInitialize, idleDelay]);
 
   const startInitialization = useCallback(async () => {
-    if (initialized.current || isInitializing) return;
-    if (typeof window === "undefined") return; // Skip on SSR
+    console.log("[useSemanticSearch] startInitialization() called");
+    
+    if (initialized.current) {
+      console.log("[useSemanticSearch] Already initialized, skipping");
+      return;
+    }
+    if (isInitializing) {
+      console.log("[useSemanticSearch] Already initializing, skipping");
+      return;
+    }
+    if (typeof window === "undefined") {
+      console.log("[useSemanticSearch] Not in browser, skipping");
+      return;
+    }
     
     setIsInitializing(true);
     setError(null);
     setProgress(10);
     
     try {
+      console.log("[useSemanticSearch] Loading semantic search module...");
       const semanticSearch = await loadSemanticSearch();
+      
+      console.log("[useSemanticSearch] Calling initializeSemanticSearch()...");
       await semanticSearch.initializeSemanticSearch();
       
+      console.log("[useSemanticSearch] Getting status...");
       const status = semanticSearch.getSemanticSearchStatus();
+      console.log(`[useSemanticSearch] Status: ready=${status.ready}, count=${status.verseCount}`);
+      
       setVerseCount(status.verseCount);
       setIsReady(status.ready);
       
@@ -85,10 +103,8 @@ export function useSemanticSearch(options: UseSemanticSearchOptions = {}) {
         setMode("semantic");
         console.log("[useSemanticSearch] ✅ AI Ready!");
       } else {
-        console.log("[useSemanticSearch] ⚠️ AI not ready - embeddings empty or failed");
-        if (status.verseCount === 0) {
-          setError("Data AI tidak tersedia. Silakan refresh halaman.");
-        }
+        console.log("[useSemanticSearch] ⚠️ AI not ready");
+        setError("AI tidak tersedia. Data mungkin belum di-download.");
       }
       
       setProgress(100);
@@ -96,9 +112,10 @@ export function useSemanticSearch(options: UseSemanticSearchOptions = {}) {
     } catch (err) {
       console.error("[useSemanticSearch] ❌ Initialization failed:", err);
       const errorMsg = err instanceof Error ? err.message : String(err);
-      setError(`Gagal memuat AI: ${errorMsg}`);
+      setError(`Error: ${errorMsg}`);
       setMode("keyword");
       setIsReady(false);
+      initialized.current = true; // Mark as attempted
     } finally {
       setIsInitializing(false);
     }

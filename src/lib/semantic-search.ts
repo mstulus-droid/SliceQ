@@ -182,62 +182,84 @@ async function loadModel(): Promise<Pipeline> {
 // Quick check if embeddings file has data (before loading model)
 async function checkEmbeddingsAvailable(): Promise<boolean> {
   try {
-    const response = await fetch(EMBEDDINGS_URL, { method: "HEAD" });
-    if (!response.ok) return false;
+    console.log("[SemanticSearch] Checking if embeddings available...");
+    console.log(`[SemanticSearch] URL: ${EMBEDDINGS_URL}`);
+    
+    const response = await fetch(EMBEDDINGS_URL);
+    console.log(`[SemanticSearch] HEAD response: ${response.status}`);
+    
+    if (!response.ok) {
+      console.error(`[SemanticSearch] HTTP error: ${response.status}`);
+      return false;
+    }
     
     // Try to load just the count from file
-    const responseFull = await fetch(EMBEDDINGS_URL);
-    const data = await responseFull.json() as EmbeddingsData;
-    return data.count > 0 && data.verses.length > 0;
-  } catch {
+    const data = await response.json() as EmbeddingsData;
+    console.log(`[SemanticSearch] Data check: count=${data.count}, verses=${data.verses?.length}`);
+    
+    const hasData = data.count > 0 && data.verses && data.verses.length > 0;
+    console.log(`[SemanticSearch] Has data: ${hasData}`);
+    return hasData;
+  } catch (err) {
+    console.error("[SemanticSearch] Check failed:", err);
     return false;
   }
 }
 
 // Main initialization function
 export async function initializeSemanticSearch(): Promise<void> {
+  console.log("[SemanticSearch] initializeSemanticSearch() called");
+  
   if (!isBrowser) {
     console.log("[SemanticSearch] Skipped - not in browser");
     return;
   }
   
   if (embeddingsData && embedder) {
+    console.log("[SemanticSearch] Already initialized");
     return; // Already initialized
   }
   
   if (isLoading && loadingPromise) {
+    console.log("[SemanticSearch] Already loading, waiting...");
     return loadingPromise; // Wait for existing load
   }
   
   isLoading = true;
   loadingPromise = (async () => {
     try {
+      console.log("[SemanticSearch] Starting initialization...");
+      
       // Quick check first - avoid loading model if no data
+      console.log("[SemanticSearch] Step 1: Check if data exists...");
       const hasData = await checkEmbeddingsAvailable();
       if (!hasData) {
-        console.log("[SemanticSearch] No embeddings data available, skipping initialization");
-        return;
+        console.error("[SemanticSearch] ❌ No embeddings data available!");
+        throw new Error("NO_EMBEDDINGS_DATA");
       }
+      console.log("[SemanticSearch] ✅ Data exists");
       
       // Load embeddings
+      console.log("[SemanticSearch] Step 2: Load embeddings...");
       const embeddings = await loadEmbeddings();
       embeddingsData = embeddings;
+      console.log(`[SemanticSearch] ✅ Embeddings loaded: ${embeddings.count} verses`);
       
       // Then load model
+      console.log("[SemanticSearch] Step 3: Load AI model...");
       const model = await loadModel();
       embedder = model;
+      console.log("[SemanticSearch] ✅ Model loaded");
       
-      console.log(`[SemanticSearch] Ready! ${embeddings.count} verses indexed`);
+      console.log(`[SemanticSearch] 🎉 Ready! ${embeddings.count} verses indexed`);
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : String(err);
-      if (errorMsg === "EMPTY_EMBEDDINGS") {
-        console.log("[SemanticSearch] Embeddings empty, using keyword search only");
-      } else {
-        console.error("[SemanticSearch] Initialization failed:", err);
-      }
+      console.error(`[SemanticSearch] ❌ Initialization failed: ${errorMsg}`, err);
+      
       // Don't throw - just mark as not ready
       embeddingsData = null;
       embedder = null;
+      throw err; // Re-throw so hook can catch it
     } finally {
       isLoading = false;
     }
