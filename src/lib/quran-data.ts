@@ -27,6 +27,7 @@ export type VerseRecord = {
   moralConcerns: string;
   scientificErrors: string;
   contradictions: string;
+  catatanDepag: string;
 };
 
 export type HomeStats = {
@@ -109,6 +110,7 @@ function mapVerse(row: {
   moral_concerns: string;
   scientific_errors: string;
   contradictions: string;
+  catatan_depag: string;
 }): VerseRecord {
   return {
     id: row.id,
@@ -126,6 +128,7 @@ function mapVerse(row: {
     moralConcerns: row.moral_concerns,
     scientificErrors: row.scientific_errors,
     contradictions: row.contradictions,
+    catatanDepag: row.catatan_depag,
   };
 }
 
@@ -289,6 +292,7 @@ export async function getVersesBySurahId(surahId: number): Promise<VerseRecord[]
     moral_concerns: string;
     scientific_errors: string;
     contradictions: string;
+    catatan_depag: string;
   }>(
     `
       select
@@ -306,7 +310,8 @@ export async function getVersesBySurahId(surahId: number): Promise<VerseRecord[]
         a.logical_fallacies,
         a.moral_concerns,
         a.scientific_errors,
-        a.contradictions
+        a.contradictions,
+        a.catatan_depag
       from verses v
       join verse_analyses a on a.verse_id = v.id
       where v.surah_id = $1
@@ -336,6 +341,7 @@ export async function getVerseById(verseId: number): Promise<VerseRecord | null>
     moral_concerns: string;
     scientific_errors: string;
     contradictions: string;
+    catatan_depag: string;
   }>(
     `
       select
@@ -353,7 +359,8 @@ export async function getVerseById(verseId: number): Promise<VerseRecord | null>
         a.logical_fallacies,
         a.moral_concerns,
         a.scientific_errors,
-        a.contradictions
+        a.contradictions,
+        a.catatan_depag
       from verses v
       join verse_analyses a on a.verse_id = v.id
       where v.id = $1
@@ -422,6 +429,7 @@ export async function getHighlightedVerses(limit = 3): Promise<VerseRecord[]> {
     moral_concerns: string;
     scientific_errors: string;
     contradictions: string;
+    catatan_depag: string;
   }>(
     `
       select
@@ -439,7 +447,8 @@ export async function getHighlightedVerses(limit = 3): Promise<VerseRecord[]> {
         a.logical_fallacies,
         a.moral_concerns,
         a.scientific_errors,
-        a.contradictions
+        a.contradictions,
+        a.catatan_depag
       from verses v
       join verse_analyses a on a.verse_id = v.id
       order by v.surah_id, v.ayah_number
@@ -485,6 +494,7 @@ export async function getBookmarks(): Promise<BookmarkRecord[]> {
     moral_concerns: string;
     scientific_errors: string;
     contradictions: string;
+    catatan_depag: string;
     bookmarked_at: string;
     note: string;
   }>(
@@ -505,6 +515,7 @@ export async function getBookmarks(): Promise<BookmarkRecord[]> {
         a.moral_concerns,
         a.scientific_errors,
         a.contradictions,
+        a.catatan_depag,
         b.created_at as bookmarked_at,
         b.note
       from bookmarks b
@@ -608,6 +619,7 @@ export async function searchVersesWithFilters({
     moral_concerns: string;
     scientific_errors: string;
     contradictions: string;
+    catatan_depag: string;
   }>(
     `
       select
@@ -625,7 +637,8 @@ export async function searchVersesWithFilters({
         a.logical_fallacies,
         a.moral_concerns,
         a.scientific_errors,
-        a.contradictions
+        a.contradictions,
+        a.catatan_depag
       from verses v
       join verse_analyses a on a.verse_id = v.id
       where

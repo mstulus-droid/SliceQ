@@ -132,11 +132,11 @@ export function VerseAnalysisDisclosures({
               ) : null}
             </p>
             {notes.length === 1 ? (
-              <div className="text-slate-700">{notes[0]}</div>
+              <div className="whitespace-pre-wrap text-slate-700">{notes[0]}</div>
             ) : (
               <ol className="list-decimal space-y-2 pl-4 text-slate-700">
                 {notes.slice(0, 5).map((note, idx) => (
-                  <li key={idx}>{note}</li>
+                  <li key={idx} className="whitespace-pre-wrap">{note}</li>
                 ))}
               </ol>
             )}

@@ -22,6 +22,42 @@ type HomePageProps = {
   }>;
 };
 
+type RevelationKind = "makkiyah" | "madaniyah" | null;
+
+function classifyRevelation(place: string): RevelationKind {
+  const normalized = place.trim().toLowerCase();
+  if (!normalized) return null;
+  if (normalized.includes("makk") || normalized.includes("mekk") || normalized.includes("mecca")) {
+    return "makkiyah";
+  }
+  if (normalized.includes("madin") || normalized.includes("medin")) {
+    return "madaniyah";
+  }
+  return null;
+}
+
+function RevelationBadge({ kind }: { kind: RevelationKind }) {
+  if (!kind) return null;
+  const isMakkiyah = kind === "makkiyah";
+  return (
+    <span
+      className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] ring-1 ${
+        isMakkiyah
+          ? "bg-amber-50 text-amber-800 ring-amber-200"
+          : "bg-emerald-50 text-emerald-800 ring-emerald-200"
+      }`}
+    >
+      <span
+        className={`h-1.5 w-1.5 rounded-full ${
+          isMakkiyah ? "bg-amber-500" : "bg-emerald-500"
+        }`}
+        aria-hidden
+      />
+      {isMakkiyah ? "Makkiyah" : "Madaniyah"}
+    </span>
+  );
+}
+
 export default async function Home({ searchParams }: HomePageProps) {
   const params = searchParams ? await searchParams : undefined;
   const surah = params?.surah?.trim() ?? "";
@@ -87,52 +123,61 @@ export default async function Home({ searchParams }: HomePageProps) {
           }))}
           list={
             <div className="divide-y divide-slate-200">
-              {surahs.map((surah) => (
-                <NavLink
-                  key={surah.id}
-                  href={`/surat/${surah.id}`}
-                  className="block px-4 py-3 transition hover:bg-[#f7f4ed] sm:px-5"
-                >
-                  <div className="hidden grid-cols-[64px_minmax(0,1fr)_minmax(110px,auto)_70px] items-center gap-4 md:grid">
-                    <span className="text-sm font-semibold text-slate-800">
-                      {surah.id}
-                    </span>
-                    <div className="min-w-0">
-                      <p className="truncate text-base font-semibold text-slate-950">
-                        {surah.nameLatin}
-                      </p>
-                      <p className="truncate text-sm text-slate-500">
-                        {surah.meaning} • {surah.revelationPlace}
-                      </p>
-                    </div>
-                    <p className="truncate text-right text-2xl text-slate-950">
-                      {surah.nameArabic}
-                    </p>
-                    <p className="text-right text-sm text-slate-500">
-                      {surah.verseCount}
-                    </p>
-                  </div>
-
-                  <div className="flex items-center gap-3 md:hidden">
-                    <span className="w-7 shrink-0 text-sm font-semibold text-slate-800">
-                      {surah.id}
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center justify-between gap-3">
-                        <p className="truncate text-sm font-semibold text-slate-950">
-                          {surah.nameLatin}
-                        </p>
-                        <p className="truncate text-lg text-slate-950">
-                          {surah.nameArabic}
+              {surahs.map((surah) => {
+                const kind = classifyRevelation(surah.revelationPlace);
+                return (
+                  <NavLink
+                    key={surah.id}
+                    href={`/surat/${surah.id}`}
+                    className="block px-4 py-3 transition hover:bg-[#f7f4ed] sm:px-5"
+                  >
+                    <div className="hidden grid-cols-[64px_minmax(0,1fr)_minmax(110px,auto)_70px] items-center gap-4 md:grid">
+                      <span className="text-sm font-semibold text-slate-800">
+                        {surah.id}
+                      </span>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <p className="truncate text-base font-semibold text-slate-950">
+                            {surah.nameLatin}
+                          </p>
+                          <RevelationBadge kind={kind} />
+                        </div>
+                        <p className="truncate text-sm text-slate-500">
+                          {surah.meaning} • {surah.revelationPlace}
                         </p>
                       </div>
-                      <p className="truncate text-xs text-slate-500">
-                        {surah.revelationPlace} • {surah.verseCount} ayat • {surah.meaning}
+                      <p className="font-arabic truncate text-right text-2xl text-slate-950">
+                        {surah.nameArabic}
+                      </p>
+                      <p className="text-right text-sm text-slate-500">
+                        {surah.verseCount}
                       </p>
                     </div>
-                  </div>
-                </NavLink>
-              ))}
+
+                    <div className="flex items-center gap-3 md:hidden">
+                      <span className="w-7 shrink-0 text-sm font-semibold text-slate-800">
+                        {surah.id}
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="flex min-w-0 items-center gap-2">
+                            <p className="truncate text-sm font-semibold text-slate-950">
+                              {surah.nameLatin}
+                            </p>
+                            <RevelationBadge kind={kind} />
+                          </div>
+                          <p className="font-arabic truncate text-lg text-slate-950">
+                            {surah.nameArabic}
+                          </p>
+                        </div>
+                        <p className="truncate text-xs text-slate-500">
+                          {surah.revelationPlace} • {surah.verseCount} ayat • {surah.meaning}
+                        </p>
+                      </div>
+                    </div>
+                  </NavLink>
+                );
+              })}
             </div>
           }
         />

@@ -4,10 +4,12 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { parseNotes } from "@/lib/parse-notes";
 import { useNavigation } from "@/components/navigation-provider";
+import { ReadingSizeToggle, useReadingPrefs } from "./use-reading-prefs";
 
 type VerseReaderCardProps = {
   arabicText: string;
   translation: string;
+  catatanDepag?: string;
   topic: string;
   asbabunNuzul: string;
   critique: string;
@@ -22,6 +24,7 @@ type VerseReaderCardProps = {
 export function VerseReaderCard({
   arabicText,
   translation,
+  catatanDepag,
   topic,
   asbabunNuzul,
   critique,
@@ -34,6 +37,7 @@ export function VerseReaderCard({
 }: VerseReaderCardProps) {
   const router = useRouter();
   const { startNavigation } = useNavigation();
+  const { prefs, setSize, tokens } = useReadingPrefs();
 
   function goToVerse(targetVerseId: number | null) {
     if (!targetVerseId) {
@@ -87,16 +91,25 @@ export function VerseReaderCard({
 
   return (
     <section className="rounded-[2rem] bg-white p-5 shadow-[0_20px_60px_-35px_rgba(15,23,42,0.35)] sm:p-8">
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-700">
+          Bacaan
+        </p>
+        <ReadingSizeToggle value={prefs.size} onChange={setSize} />
+      </div>
+
       {asbabunNuzul ? (
-        <div className="mb-6 rounded-[1.25rem] bg-amber-50/70 p-4 ring-1 ring-amber-100">
+        <div className="mb-6 reading-measure rounded-[1.25rem] bg-amber-50/70 p-4 ring-1 ring-amber-100">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-700">
             Asbabun Nuzul
           </p>
-          <p className="mt-2 text-sm leading-7 text-slate-700">{asbabunNuzul}</p>
+          <p className="font-serif-reading mt-2 whitespace-pre-wrap text-sm leading-7 text-slate-700">
+            {asbabunNuzul}
+          </p>
         </div>
       ) : null}
 
-      <div className="mb-5">
+      <div className="mb-5 reading-measure">
         <p className="text-sm leading-7 text-slate-700">
           <span className="mr-2 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-700">
             Topik
@@ -105,7 +118,7 @@ export function VerseReaderCard({
         </p>
       </div>
 
-      <div className="flex items-stretch overflow-hidden rounded-[1.5rem] ring-1 ring-slate-200 bg-[linear-gradient(180deg,#faf8f1_0%,#ffffff_100%)]">
+      <div className="flex items-stretch overflow-hidden rounded-[1.5rem] ring-1 ring-slate-200 bg-[linear-gradient(180deg,#faf8f1_0%,#ffffff_100%)] paper-texture">
         <button
           type="button"
           onClick={() => goToVerse(previousVerseId)}
@@ -126,12 +139,37 @@ export function VerseReaderCard({
         </button>
 
         <div className="min-w-0 flex-1 border-x border-slate-100/60 px-4 py-5 sm:px-6">
-          <p className="text-right text-3xl leading-[2.1] text-slate-950 sm:text-5xl">
-            {arabicText}
-          </p>
-          <p className="mt-4 text-base leading-8 text-slate-700 sm:text-lg">
-            {translation}
-          </p>
+          <div className="reading-measure">
+            <p
+              className={`font-arabic text-right text-slate-950 ${tokens.arabic}`}
+            >
+              {arabicText}
+            </p>
+            <div className="ornament-divider my-4" aria-hidden>
+              <svg width="14" height="14" viewBox="0 0 14 14">
+                <path
+                  d="M7 1 L9 5 L13 7 L9 9 L7 13 L5 9 L1 7 L5 5 Z"
+                  fill="currentColor"
+                  opacity="0.7"
+                />
+              </svg>
+            </div>
+            <p
+              className={`font-serif-reading mt-1 text-slate-700 ${tokens.translation}`}
+            >
+              {translation}
+            </p>
+            {catatanDepag ? (
+              <div className="mt-5 rounded-[1.25rem] bg-amber-50/60 p-4 ring-1 ring-amber-100/80">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-amber-700">
+                  Catatan Depag
+                </p>
+                <p className="font-serif-reading mt-1 whitespace-pre-wrap text-sm leading-7 text-slate-700">
+                  {catatanDepag}
+                </p>
+              </div>
+            ) : null}
+          </div>
         </div>
 
         <button
@@ -164,7 +202,9 @@ export function VerseReaderCard({
                 <p className={`text-[10px] font-semibold uppercase tracking-wider ${notes[0].labelColor}`}>
                   {notes[0].label}
                 </p>
-                <div className="mt-1 text-sm leading-6 text-slate-700"><NoteContent text={notes[0].text} /></div>
+                <div className="font-serif-reading mt-1 text-sm leading-6 text-slate-700">
+                  <NoteContent text={notes[0].text} />
+                </div>
               </div>
             </div>
           ) : noteCount === 2 ? (
@@ -177,7 +217,9 @@ export function VerseReaderCard({
                   <p className={`text-[10px] font-semibold uppercase tracking-wider ${note.labelColor}`}>
                     {note.label}
                   </p>
-                  <p className="mt-1 text-sm leading-6 text-slate-700">{note.text}</p>
+                  <p className="font-serif-reading mt-1 text-sm leading-6 text-slate-700">
+                    {note.text}
+                  </p>
                 </div>
               ))}
             </div>
@@ -195,7 +237,9 @@ export function VerseReaderCard({
                     <p className={`text-[10px] font-semibold uppercase tracking-wider ${note.labelColor}`}>
                       {note.label}
                     </p>
-                    <div className="mt-1 text-sm leading-6 text-slate-700"><NoteContent text={note.text} /></div>
+                    <div className="font-serif-reading mt-1 text-sm leading-6 text-slate-700">
+                      <NoteContent text={note.text} />
+                    </div>
                   </div>
                 ))}
               </div>
@@ -214,12 +258,12 @@ export function VerseReaderCard({
 function NoteContent({ text }: { text: string }) {
   const notes = parseNotes(text);
   if (notes.length === 1) {
-    return <p>{notes[0]}</p>;
+    return <p className="whitespace-pre-wrap">{notes[0]}</p>;
   }
   return (
     <ol className="list-decimal space-y-1 pl-4 text-left">
       {notes.slice(0, 5).map((note, idx) => (
-        <li key={idx}>{note}</li>
+        <li key={idx} className="whitespace-pre-wrap">{note}</li>
       ))}
     </ol>
   );

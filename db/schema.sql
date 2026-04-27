@@ -39,9 +39,13 @@ CREATE TABLE IF NOT EXISTS verse_analyses (
   moral_concerns TEXT NOT NULL DEFAULT '',
   scientific_errors TEXT NOT NULL DEFAULT '',
   contradictions TEXT NOT NULL DEFAULT '',
+  catatan_depag TEXT NOT NULL DEFAULT '',
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+ALTER TABLE verse_analyses
+ADD COLUMN IF NOT EXISTS catatan_depag TEXT NOT NULL DEFAULT '';
 
 ALTER TABLE verse_analyses
 ADD COLUMN IF NOT EXISTS scientific_errors TEXT NOT NULL DEFAULT '';
@@ -65,3 +69,15 @@ CREATE INDEX IF NOT EXISTS idx_verse_analyses_scientific_errors ON verse_analyse
 CREATE INDEX IF NOT EXISTS idx_verse_analyses_contradictions ON verse_analyses USING GIN (to_tsvector('simple', contradictions));
 CREATE INDEX IF NOT EXISTS idx_verses_translation ON verses USING GIN (to_tsvector('simple', translation));
 CREATE INDEX IF NOT EXISTS idx_bookmarks_created_at ON bookmarks(created_at DESC);
+
+-- Enable Row Level Security (RLS) on all public tables
+ALTER TABLE surahs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE verses ENABLE ROW LEVEL SECURITY;
+ALTER TABLE verse_analyses ENABLE ROW LEVEL SECURITY;
+ALTER TABLE bookmarks ENABLE ROW LEVEL SECURITY;
+
+-- Allow public read access for anonymous users (data is public)
+CREATE POLICY "Allow public read" ON surahs FOR SELECT TO anon USING (true);
+CREATE POLICY "Allow public read" ON verses FOR SELECT TO anon USING (true);
+CREATE POLICY "Allow public read" ON verse_analyses FOR SELECT TO anon USING (true);
+CREATE POLICY "Allow public read" ON bookmarks FOR SELECT TO anon USING (true);

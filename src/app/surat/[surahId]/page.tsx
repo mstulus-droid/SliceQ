@@ -9,6 +9,7 @@ import {
   getSurahById,
   getVersesBySurahId,
 } from "@/lib/quran-data";
+import { ReadingProgress } from "@/app/reading-progress";
 import { SurahContextToggle } from "./surah-context-toggle";
 import { SurahFloatingControls } from "./surah-floating-controls";
 import { SurahJumpControl } from "./surah-jump-control";
@@ -161,7 +162,11 @@ export default async function SurahDetailPage({ params }: PageProps) {
   );
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,#eef6ef_0%,#f8f4ea_100%)] px-3 py-8 sm:px-8 lg:px-12">
+    <main
+      id="surah-reading-root"
+      className="min-h-screen bg-[linear-gradient(180deg,#eef6ef_0%,#f8f4ea_100%)] px-3 py-8 sm:px-8 lg:px-12"
+    >
+      <ReadingProgress targetId="surah-reading-root" />
       <div className="mx-auto flex max-w-6xl flex-col gap-5">
         <SurahStickyTitle surahNumber={surah.id} title={surah.nameLatin} />
         <SurahFloatingControls
@@ -183,7 +188,7 @@ export default async function SurahDetailPage({ params }: PageProps) {
             <h1 className="mt-2 text-4xl font-semibold tracking-tight sm:text-5xl">
               {surah.nameLatin}
             </h1>
-            <p className="mt-3 text-5xl text-white/90 sm:text-6xl">
+            <p className="font-arabic mt-3 text-5xl text-white/90 sm:text-6xl">
               {surah.nameArabic}
             </p>
             <div className="mt-4 space-y-2 text-sm leading-7 text-slate-300 sm:text-base">
@@ -277,12 +282,22 @@ export default async function SurahDetailPage({ params }: PageProps) {
                         href={`/ayat/${verse.id}`}
                         className="mt-5 block rounded-[1.4rem] bg-[linear-gradient(180deg,#faf8f1_0%,#ffffff_100%)] px-4 py-5 ring-1 ring-slate-200 transition hover:bg-slate-50"
                       >
-                        <p className="text-right text-3xl leading-[2] text-slate-950 sm:text-4xl">
+                        <p className="font-arabic text-right text-3xl leading-[2] text-slate-950 sm:text-4xl">
                           {verse.arabicText}
                         </p>
-                        <p className="mt-4 text-base leading-8 text-slate-700">
+                        <p className="font-serif-reading mt-4 text-base leading-8 text-slate-700">
                           {verse.translation}
                         </p>
+                        {verse.catatanDepag ? (
+                          <div className="mt-4 rounded-[1.25rem] bg-amber-50/60 p-4 ring-1 ring-amber-100/80">
+                            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-amber-700">
+                              Catatan Depag
+                            </p>
+                            <p className="mt-1 whitespace-pre-wrap text-sm leading-7 text-slate-700">
+                              {verse.catatanDepag}
+                            </p>
+                          </div>
+                        ) : null}
                       </NavLink>
 
                       {verse.asbabunNuzul ? (
@@ -290,7 +305,7 @@ export default async function SurahDetailPage({ params }: PageProps) {
                           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-700">
                             Asbabun Nuzul
                           </p>
-                          <p className="mt-2 text-sm leading-7 text-slate-700">
+                          <p className="mt-2 whitespace-pre-wrap text-sm leading-7 text-slate-700">
                             {verse.asbabunNuzul}
                           </p>
                         </div>

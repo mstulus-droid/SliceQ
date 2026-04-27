@@ -4,8 +4,7 @@ import { useState, useTransition, useCallback } from "react";
 import Link from "next/link";
 import { HomeControls } from "./home-controls";
 import { HomeStickySection } from "./home-sticky-section";
-import { searchVersesAction } from "./actions";
-import { VerseRecord } from "@/lib/quran-data";
+import { searchVersesAction, type ScoredVerseRecord } from "./actions";
 import { HighlightedText } from "@/app/highlighted-text";
 
 
@@ -22,7 +21,17 @@ type HomeClientWrapperProps = {
   list: React.ReactNode;
 };
 
-function CompactResultCard({ verse, query }: { verse: VerseRecord; query: string }) {
+function CompactResultCard({
+  verse,
+  query,
+}: {
+  verse: ScoredVerseRecord;
+  query: string;
+}) {
+  const ratio =
+    verse.maxScore > 0 ? Math.max(0.04, verse.score / verse.maxScore) : 0;
+  const percent = Math.round(ratio * 100);
+
   return (
     <Link
       href={`/ayat/${verse.id}`}
@@ -30,13 +39,33 @@ function CompactResultCard({ verse, query }: { verse: VerseRecord; query: string
       rel="noopener noreferrer"
       className="block rounded-[1.25rem] border border-slate-200 bg-[linear-gradient(180deg,#fcfbf7_0%,#f6f1e8_100%)] p-3 transition hover:bg-white sm:p-4"
     >
-      <p className="truncate text-xs font-semibold text-slate-500">
-        {verse.surahNameIndonesian} • Ayat {verse.ayahNumber}
-      </p>
-      <p className="mt-2 line-clamp-2 text-right text-lg leading-[1.8] text-slate-950 sm:text-xl">
+      <div className="flex items-center justify-between gap-3">
+        <p className="truncate text-xs font-semibold text-slate-500">
+          {verse.surahNameIndonesian} • Ayat {verse.ayahNumber}
+        </p>
+        {verse.maxScore > 0 ? (
+          <span
+            className="shrink-0 text-[10px] font-semibold uppercase tracking-[0.14em] text-emerald-700"
+            aria-label={`Relevansi ${percent} persen`}
+          >
+            {percent}%
+          </span>
+        ) : null}
+      </div>
+
+      {verse.maxScore > 0 ? (
+        <div className="mt-1.5 similarity-track">
+          <div
+            className="similarity-fill"
+            style={{ width: `${percent}%` }}
+          />
+        </div>
+      ) : null}
+
+      <p className="font-arabic mt-2 line-clamp-2 text-right text-xl leading-[1.8] text-slate-950 sm:text-2xl">
         {verse.arabicText}
       </p>
-      <p className="mt-2 line-clamp-3 text-sm leading-6 text-slate-700">
+      <p className="font-serif-reading mt-2 line-clamp-3 text-sm leading-6 text-slate-700">
         <HighlightedText text={verse.translation} query={query} />
       </p>
       {verse.critique ? (
@@ -55,13 +84,13 @@ export function HomeClientWrapper({
   list,
 }: HomeClientWrapperProps) {
   const [openPanel, setOpenPanel] = useState<"search" | "jump" | null>(null);
-  const [results, setResults] = useState<VerseRecord[] | null>(null);
+  const [results, setResults] = useState<ScoredVerseRecord[] | null>(null);
   const [query, setQuery] = useState("");
   const [isPending, startTransition] = useTransition();
 
   const handleSearch = useCallback(async (q: string) => {
     setQuery(q);
-    
+
     startTransition(async () => {
       const results = await searchVersesAction(q);
       setResults(results);
@@ -117,9 +146,9 @@ export function HomeClientWrapper({
           {results.length > 0 ? (
             <div className="mt-3 flex flex-col gap-2">
               {results.map((verse) => (
-                <CompactResultCard 
-                  key={verse.id} 
-                  verse={verse} 
+                <CompactResultCard
+                  key={verse.id}
+                  verse={verse}
                   query={query}
                 />
               ))}

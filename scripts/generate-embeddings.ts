@@ -48,6 +48,7 @@ async function generateEmbeddings() {
     moral_concerns: string;
     scientific_errors: string;
     contradictions: string;
+    catatan_depag: string;
   }>(`
     SELECT
       v.id,
@@ -61,7 +62,8 @@ async function generateEmbeddings() {
       COALESCE(a.logical_fallacies, '') as logical_fallacies,
       COALESCE(a.moral_concerns, '') as moral_concerns,
       COALESCE(a.scientific_errors, '') as scientific_errors,
-      COALESCE(a.contradictions, '') as contradictions
+      COALESCE(a.contradictions, '') as contradictions,
+      COALESCE(a.catatan_depag, '') as catatan_depag
     FROM verses v
     JOIN verse_analyses a ON a.verse_id = v.id
     ORDER BY v.id
@@ -95,6 +97,7 @@ async function generateEmbeddings() {
         row.moral_concerns,
         row.scientific_errors,
         row.contradictions,
+        row.catatan_depag,
       ]
         .filter(Boolean)
         .join(". ");

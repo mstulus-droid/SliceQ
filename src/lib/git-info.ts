@@ -1,6 +1,6 @@
 export const GIT_INFO = {
-  "hash": "1095939",
-  "message": "chore: hapus file embeddings 51MB dan tambah ke .gitignore\n\n- Hapus public/embeddings/verses-embeddings.json (51MB)\n- Tambah embeddings/*.json ke .gitignore\n- File tidak lagi ter-track di repo",
-  "date": "2026-04-11 00:54:31 +0700",
+  "hash": "be3a4a6",
+  "message": "ui: bersihkan semantic search - hanya tampilkan kotak pencarian\n\n- Hapus indikator status 'Pencarian' dan 'Refresh AI'\n- Hapus badge 'AI Search' dari hasil\n- Sederhanakan logic pencarian ke keyword search only",
+  "date": "2026-04-11 01:05:42 +0700",
   "branch": "main"
 };

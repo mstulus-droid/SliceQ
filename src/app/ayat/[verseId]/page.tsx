@@ -8,6 +8,7 @@ import {
   isVerseBookmarked,
 } from "@/lib/quran-data";
 import { BookmarkButton } from "@/app/bookmark/bookmark-button";
+import { ReadingProgress } from "@/app/reading-progress";
 import { VerseReaderCard } from "./verse-reader-card";
 
 type PageProps = {
@@ -65,7 +66,11 @@ export default async function VerseDetailPage({ params }: PageProps) {
   }
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top,#e9f7ef,transparent_28%),linear-gradient(180deg,#f7f3ea_0%,#f4efe5_100%)] px-4 py-6 sm:px-8 sm:py-8 lg:px-12">
+    <main
+      id="verse-reading-root"
+      className="min-h-screen bg-[radial-gradient(circle_at_top,#e9f7ef,transparent_28%),linear-gradient(180deg,#f7f3ea_0%,#f4efe5_100%)] px-4 py-6 sm:px-8 sm:py-8 lg:px-12"
+    >
+      <ReadingProgress targetId="verse-reading-root" />
       <div className="mx-auto flex max-w-5xl flex-col gap-5">
         <section className="rounded-[2rem] bg-slate-950 p-6 text-white shadow-[0_30px_80px_-35px_rgba(15,23,42,0.7)] sm:p-8">
           <div className="flex flex-col items-center gap-4 text-center">
@@ -105,6 +110,7 @@ export default async function VerseDetailPage({ params }: PageProps) {
         <VerseReaderCard
           arabicText={verse.arabicText}
           translation={verse.translation}
+          catatanDepag={verse.catatanDepag}
           topic={verse.topic}
           asbabunNuzul={verse.asbabunNuzul}
           critique={verse.critique}

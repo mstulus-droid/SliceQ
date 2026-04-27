@@ -1,5 +1,10 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Mono, Manrope } from "next/font/google";
+import {
+  IBM_Plex_Mono,
+  Manrope,
+  Scheherazade_New,
+  Source_Serif_4,
+} from "next/font/google";
 import { Suspense } from "react";
 import { InitialSplash } from "@/app/initial-splash";
 import { NavigationProvider } from "@/components/navigation-provider";
@@ -15,6 +20,20 @@ const plexMono = IBM_Plex_Mono({
   variable: "--font-plex-mono",
   subsets: ["latin"],
   weight: ["400", "500", "600"],
+});
+
+const scheherazade = Scheherazade_New({
+  variable: "--font-scheherazade",
+  subsets: ["arabic"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
+
+const sourceSerif = Source_Serif_4({
+  variable: "--font-source-serif",
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -48,7 +67,7 @@ export default function RootLayout({
   return (
     <html
       lang="id"
-      className={`${manrope.variable} ${plexMono.variable} h-full antialiased`}
+      className={`${manrope.variable} ${plexMono.variable} ${scheherazade.variable} ${sourceSerif.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-stone-50 text-slate-950">
         <Suspense fallback={null}>

@@ -10,6 +10,8 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-manrope);
   --font-mono: var(--font-plex-mono);
+  --font-arabic: var(--font-scheherazade);
+  --font-serif-reading: var(--font-source-serif);
 }
 
 .scrollbar-hide {
@@ -42,6 +44,117 @@ a {
   background: #bbf7d0;
   color: #052e16;
 }
+
+/* ---------- Reading typography ---------- */
+
+.font-arabic {
+  font-family: var(--font-scheherazade), "Amiri", "Scheherazade New", serif;
+  font-feature-settings: "liga", "calt";
+}
+
+.font-serif-reading {
+  font-family: var(--font-source-serif), Georgia, "Source Serif 4", serif;
+  font-feature-settings: "liga", "calt";
+}
+
+.reading-measure {
+  max-width: 68ch;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ---------- Paper & ornament ---------- */
+
+.paper-texture {
+  background-image:
+    radial-gradient(rgba(120, 89, 41, 0.045) 1px, transparent 1px),
+    radial-gradient(rgba(120, 89, 41, 0.03) 1px, transparent 1px);
+  background-size: 22px 22px, 11px 11px;
+  background-position: 0 0, 11px 11px;
+}
+
+.ornament-divider {
+  position: relative;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #a8853f;
+  opacity: 0.7;
+}
+.ornament-divider::before,
+.ornament-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(168, 133, 63, 0.45),
+    transparent
+  );
+}
+.ornament-divider::before { margin-right: 12px; }
+.ornament-divider::after { margin-left: 12px; }
+.ornament-divider svg { display: block; }
+
+/* ---------- Animated highlight underline ---------- */
+
+@keyframes hl-underline {
+  from { background-size: 0% 100%; }
+  to   { background-size: 100% 100%; }
+}
+
+.hl-mark {
+  background-image: linear-gradient(
+    180deg,
+    transparent 60%,
+    rgba(252, 211, 77, 0.6) 60%,
+    rgba(252, 211, 77, 0.6) 95%,
+    transparent 95%
+  );
+  background-repeat: no-repeat;
+  background-size: 0% 100%;
+  background-position: left center;
+  animation: hl-underline 420ms cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+  border-radius: 2px;
+  padding: 0 1px;
+}
+
+/* ---------- Similarity bar ---------- */
+
+.similarity-track {
+  height: 3px;
+  background: rgba(15, 23, 42, 0.06);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.similarity-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #34d399, #059669);
+  border-radius: 999px;
+  transform-origin: left center;
+  animation: sim-grow 520ms cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+@keyframes sim-grow {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+/* ---------- Reading progress (top bar) ---------- */
+
+.reading-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #a8853f, #059669);
+  z-index: 60;
+  transform-origin: left center;
+  will-change: transform;
+}
+
+/* ---------- Existing keyframes ---------- */
 
 @keyframes hint-bounce {
   0%, 100% { transform: translateY(0); }

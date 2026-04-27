@@ -2,6 +2,11 @@
 
 import { VerseRecord, searchVersesWithFilters, getVerseById } from "@/lib/quran-data";
 
+export type ScoredVerseRecord = VerseRecord & {
+  score: number;
+  maxScore: number;
+};
+
 function countMatches(text: string, query: string): number {
   if (!query || !text) return 0;
   const normalizedText = text.toLowerCase();
@@ -33,7 +38,9 @@ function scoreVerse(verse: VerseRecord, query: string): number {
   return score;
 }
 
-export async function searchVersesAction(query: string): Promise<VerseRecord[]> {
+export async function searchVersesAction(
+  query: string,
+): Promise<ScoredVerseRecord[]> {
   const results = await searchVersesWithFilters({
     query,
     limit: 10000, // virtually unlimited
@@ -66,7 +73,13 @@ export async function searchVersesAction(query: string): Promise<VerseRecord[]> 
     return true;
   });
 
-  return deduped.map((s) => s.verse);
+  const maxScore = deduped[0]?.score ?? 0;
+
+  return deduped.map((s) => ({
+    ...s.verse,
+    score: s.score,
+    maxScore,
+  }));
 }
 
 /**
@@ -74,7 +87,7 @@ export async function searchVersesAction(query: string): Promise<VerseRecord[]> 
  */
 export async function getVersesByIds(ids: number[]): Promise<VerseRecord[]> {
   const verses: VerseRecord[] = [];
-  
+
   // Fetch in parallel with limited concurrency
   const batchSize = 10;
   for (let i = 0; i < ids.length; i += batchSize) {
@@ -84,6 +97,6 @@ export async function getVersesByIds(ids: number[]): Promise<VerseRecord[]> {
     );
     verses.push(...batchResults.filter((v): v is VerseRecord => v !== null));
   }
-  
+
   return verses;
 }

@@ -47,10 +47,7 @@ export function HighlightedText({
         }
 
         return (
-          <mark
-            key={`${part}-${index}`}
-            className="rounded bg-amber-200/80 px-1 py-0.5 text-inherit"
-          >
+          <mark key={`${part}-${index}`} className="hl-mark text-inherit">
             {part}
           </mark>
         );
