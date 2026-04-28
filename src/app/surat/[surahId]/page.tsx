@@ -18,6 +18,7 @@ import { SurahStickyTitle } from "./surah-sticky-title";
 import { SurahStatsPanel } from "./surah-stats-panel";
 import { SurahTopicPanel } from "./surah-topic-panel";
 import { VerseAnalysisDisclosures } from "./verse-analysis-disclosures";
+import { MarkdownText } from "@/components/markdown-text";
 
 type PageProps = {
   params: Promise<{ surahId: string }>;
@@ -254,8 +255,8 @@ export default async function SurahDetailPage({ params }: PageProps) {
                     <div className="absolute bottom-8 left-3 hidden h-px w-5 bg-emerald-200 sm:block" />
                     <div className="sticky top-12 z-20 mb-3 mx-auto w-fit rounded-[1.25rem] border border-emerald-200/80 bg-emerald-50/92 px-4 py-3 text-center text-sm font-semibold leading-7 text-emerald-950 shadow-[0_12px_34px_-28px_rgba(6,78,59,0.5)] backdrop-blur sm:mx-0 sm:w-auto sm:text-left sm:top-14">
                       {group.verses[0].ayahNumber === group.verses[group.verses.length - 1].ayahNumber
-                        ? `${group.verses[0].ayahNumber} : ${group.topic}`
-                        : `${group.verses[0].ayahNumber}-${group.verses[group.verses.length - 1].ayahNumber} : ${group.topic}`}
+                        ? <>{group.verses[0].ayahNumber} : <MarkdownText text={group.topic} /></>
+                        : <>{group.verses[0].ayahNumber}-{group.verses[group.verses.length - 1].ayahNumber} : <MarkdownText text={group.topic} /></>}
                     </div>
                   </>
                 ) : null}
@@ -273,7 +274,7 @@ export default async function SurahDetailPage({ params }: PageProps) {
                         </p>
                         {!group.topic ? (
                           <p className="text-sm text-slate-600">
-                            {verse.topic || "Tanpa topik"}
+                            <MarkdownText text={verse.topic || "Tanpa topik"} />
                           </p>
                         ) : null}
                       </div>
@@ -286,7 +287,7 @@ export default async function SurahDetailPage({ params }: PageProps) {
                           {verse.arabicText}
                         </p>
                         <p className="font-serif-reading mt-4 text-base leading-8 text-slate-700">
-                          {verse.translation}
+                          <MarkdownText text={verse.translation} />
                         </p>
                         {verse.catatanDepag ? (
                           <div className="mt-4 rounded-[1.25rem] bg-amber-50/60 p-4 ring-1 ring-amber-100/80">
@@ -294,7 +295,7 @@ export default async function SurahDetailPage({ params }: PageProps) {
                               Catatan Depag
                             </p>
                             <p className="mt-1 whitespace-pre-wrap text-sm leading-7 text-slate-700">
-                              {verse.catatanDepag}
+                              <MarkdownText text={verse.catatanDepag} />
                             </p>
                           </div>
                         ) : null}
@@ -306,7 +307,7 @@ export default async function SurahDetailPage({ params }: PageProps) {
                             Asbabun Nuzul
                           </p>
                           <p className="mt-2 whitespace-pre-wrap text-sm leading-7 text-slate-700">
-                            {verse.asbabunNuzul}
+                            <MarkdownText text={verse.asbabunNuzul} />
                           </p>
                         </div>
                       ) : null}

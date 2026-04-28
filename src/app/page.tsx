@@ -36,19 +36,24 @@ function classifyRevelation(place: string): RevelationKind {
   return null;
 }
 
-function RevelationBadge({ kind }: { kind: RevelationKind }) {
+function RevelationBadge({ kind, size = "md" }: { kind: RevelationKind; size?: "sm" | "md" }) {
   if (!kind) return null;
   const isMakkiyah = kind === "makkiyah";
+  const sizeClasses =
+    size === "sm"
+      ? "gap-0.5 rounded-full px-1.5 py-0 text-[8px] tracking-[0.1em]"
+      : "gap-1 rounded-full px-2 py-0.5 text-[10px] tracking-[0.14em]";
+  const dotSize = size === "sm" ? "h-1 w-1" : "h-1.5 w-1.5";
   return (
     <span
-      className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] ring-1 ${
+      className={`inline-flex shrink-0 items-center font-semibold uppercase ring-1 ${sizeClasses} ${
         isMakkiyah
           ? "bg-amber-50 text-amber-800 ring-amber-200"
           : "bg-emerald-50 text-emerald-800 ring-emerald-200"
       }`}
     >
       <span
-        className={`h-1.5 w-1.5 rounded-full ${
+        className={`rounded-full ${dotSize} ${
           isMakkiyah ? "bg-amber-500" : "bg-emerald-500"
         }`}
         aria-hidden
@@ -131,27 +136,24 @@ export default async function Home({ searchParams }: HomePageProps) {
                     href={`/surat/${surah.id}`}
                     className="block px-4 py-3 transition hover:bg-[#f7f4ed] sm:px-5"
                   >
-                    <div className="hidden grid-cols-[64px_minmax(0,1fr)_minmax(110px,auto)_70px] items-center gap-4 md:grid">
+                    <div className="hidden grid-cols-[64px_minmax(0,1fr)_minmax(140px,auto)] items-center gap-4 md:grid">
                       <span className="text-sm font-semibold text-slate-800">
                         {surah.id}
                       </span>
                       <div className="min-w-0">
-                        <div className="flex items-center gap-2">
-                          <p className="truncate text-base font-semibold text-slate-950">
-                            {surah.nameLatin}
-                          </p>
-                          <RevelationBadge kind={kind} />
-                        </div>
+                        <p className="truncate text-lg font-semibold text-slate-950">
+                          {surah.nameLatin}
+                        </p>
                         <p className="truncate text-sm text-slate-500">
-                          {surah.meaning} • {surah.revelationPlace}
+                          {surah.meaning} • {surah.verseCount} ayat
                         </p>
                       </div>
-                      <p className="font-arabic truncate text-right text-2xl text-slate-950">
-                        {surah.nameArabic}
-                      </p>
-                      <p className="text-right text-sm text-slate-500">
-                        {surah.verseCount}
-                      </p>
+                      <div className="flex items-center gap-2">
+                        <p className="font-arabic truncate text-3xl text-slate-950">
+                          {surah.nameArabic}
+                        </p>
+                        <RevelationBadge kind={kind} />
+                      </div>
                     </div>
 
                     <div className="flex items-center gap-3 md:hidden">
@@ -159,20 +161,25 @@ export default async function Home({ searchParams }: HomePageProps) {
                         {surah.id}
                       </span>
                       <div className="min-w-0 flex-1">
-                        <div className="flex items-center justify-between gap-3">
-                          <div className="flex min-w-0 items-center gap-2">
-                            <p className="truncate text-sm font-semibold text-slate-950">
-                              {surah.nameLatin}
-                            </p>
-                            <RevelationBadge kind={kind} />
-                          </div>
-                          <p className="font-arabic truncate text-lg text-slate-950">
-                            {surah.nameArabic}
-                          </p>
-                        </div>
-                        <p className="truncate text-xs text-slate-500">
-                          {surah.revelationPlace} • {surah.verseCount} ayat • {surah.meaning}
+                        <p className="truncate text-base font-semibold text-slate-950">
+                          {surah.nameLatin}
                         </p>
+                        <p className="truncate text-xs text-slate-500">
+                          {surah.meaning} • {surah.verseCount} ayat
+                        </p>
+                      </div>
+                      <div className="flex flex-[2] min-w-0 items-center gap-2">
+                        <p className="font-arabic flex-1 truncate text-right text-3xl text-slate-950">
+                          {surah.nameArabic}
+                        </p>
+                        {kind ? (
+                          <RevelationBadge kind={kind} size="sm" />
+                        ) : (
+                          <span className="invisible inline-flex shrink-0 items-center gap-0.5 rounded-full px-1.5 py-0 text-[8px] font-semibold uppercase tracking-[0.1em] ring-1">
+                            <span className="h-1 w-1 rounded-full" aria-hidden />
+                            Madaniyah
+                          </span>
+                        )}
                       </div>
                     </div>
                   </NavLink>

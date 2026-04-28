@@ -1,4 +1,5 @@
 import { Fragment } from "react";
+import { MarkdownText } from "@/components/markdown-text";
 
 type HighlightedTextProps = {
   text: string;
@@ -31,7 +32,7 @@ export function HighlightedText({
   const pattern = buildHighlightPattern(query);
 
   if (!pattern) {
-    return <span className={className}>{text}</span>;
+    return <MarkdownText text={text} className={className} />;
   }
 
   const parts = text.split(pattern);
@@ -43,7 +44,7 @@ export function HighlightedText({
         pattern.lastIndex = 0;
 
         if (!isMatch) {
-          return <Fragment key={`${part}-${index}`}>{part}</Fragment>;
+          return <MarkdownText key={`${part}-${index}`} text={part} />;
         }
 
         return (

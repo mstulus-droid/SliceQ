@@ -1,5 +1,7 @@
 "use client";
 
+import { MarkdownText } from "@/components/markdown-text";
+
 import { useState, useEffect, useRef } from "react";
 import type { VerseRecord } from "@/lib/quran-data";
 
@@ -198,7 +200,7 @@ export function SurahStatsPanel({ verses, surahNameLatin }: SurahStatsPanelProps
                             {surahNameLatin} {verse.ayahNumber}
                           </span>
                           <p className="flex-1 text-sm leading-6 text-slate-700 line-clamp-3">
-                            {verse.content}
+                            <MarkdownText text={verse.content} />
                           </p>
                         </div>
                       </button>

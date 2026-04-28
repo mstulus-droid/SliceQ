@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { parseNotes } from "@/lib/parse-notes";
 import { useNavigation } from "@/components/navigation-provider";
+import { MarkdownText } from "@/components/markdown-text";
 import { ReadingSizeToggle, useReadingPrefs } from "./use-reading-prefs";
 
 type VerseReaderCardProps = {
@@ -49,6 +50,30 @@ export function VerseReaderCard({
   }
 
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      const target = event.target as HTMLElement | null;
+      const isTyping =
+        target &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.isContentEditable);
+
+      if (isTyping) return;
+
+      if (event.key === "ArrowLeft" && previousVerseId) {
+        event.preventDefault();
+        goToVerse(previousVerseId);
+      } else if (event.key === "ArrowRight" && nextVerseId) {
+        event.preventDefault();
+        goToVerse(nextVerseId);
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [previousVerseId, nextVerseId]);
 
   const notes = [
     {
@@ -104,7 +129,7 @@ export function VerseReaderCard({
             Asbabun Nuzul
           </p>
           <p className="font-serif-reading mt-2 whitespace-pre-wrap text-sm leading-7 text-slate-700">
-            {asbabunNuzul}
+            <MarkdownText text={asbabunNuzul} />
           </p>
         </div>
       ) : null}
@@ -114,7 +139,7 @@ export function VerseReaderCard({
           <span className="mr-2 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-700">
             Topik
           </span>
-          {topic || "Belum ada ringkasan topik untuk ayat ini."}
+          <MarkdownText text={topic || "Belum ada ringkasan topik untuk ayat ini."} />
         </p>
       </div>
 
@@ -157,7 +182,7 @@ export function VerseReaderCard({
             <p
               className={`font-serif-reading mt-1 text-slate-700 ${tokens.translation}`}
             >
-              {translation}
+              <MarkdownText text={translation} />
             </p>
             {catatanDepag ? (
               <div className="mt-5 rounded-[1.25rem] bg-amber-50/60 p-4 ring-1 ring-amber-100/80">
@@ -165,7 +190,7 @@ export function VerseReaderCard({
                   Catatan Depag
                 </p>
                 <p className="font-serif-reading mt-1 whitespace-pre-wrap text-sm leading-7 text-slate-700">
-                  {catatanDepag}
+                  <MarkdownText text={catatanDepag} />
                 </p>
               </div>
             ) : null}
@@ -218,7 +243,7 @@ export function VerseReaderCard({
                     {note.label}
                   </p>
                   <p className="font-serif-reading mt-1 text-sm leading-6 text-slate-700">
-                    {note.text}
+                    <MarkdownText text={note.text} />
                   </p>
                 </div>
               ))}
@@ -258,12 +283,12 @@ export function VerseReaderCard({
 function NoteContent({ text }: { text: string }) {
   const notes = parseNotes(text);
   if (notes.length === 1) {
-    return <p className="whitespace-pre-wrap">{notes[0]}</p>;
+    return <p className="whitespace-pre-wrap"><MarkdownText text={notes[0]} /></p>;
   }
   return (
     <ol className="list-decimal space-y-1 pl-4 text-left">
       {notes.slice(0, 5).map((note, idx) => (
-        <li key={idx} className="whitespace-pre-wrap">{note}</li>
+        <li key={idx} className="whitespace-pre-wrap"><MarkdownText text={note} /></li>
       ))}
     </ol>
   );

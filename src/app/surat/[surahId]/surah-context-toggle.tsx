@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { MarkdownText } from "@/components/markdown-text";
 
 type SurahContextToggleProps = {
   context: string;
@@ -43,7 +44,7 @@ export function SurahContextToggle({ context }: SurahContextToggleProps) {
       >
         <div className="overflow-hidden">
           <p className="whitespace-pre-line rounded-[1.25rem] border border-white/10 bg-white/5 px-4 py-3 text-left text-sm leading-7 text-slate-200">
-            {context}
+            <MarkdownText text={context} />
           </p>
         </div>
       </div>
