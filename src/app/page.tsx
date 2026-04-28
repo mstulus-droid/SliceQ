@@ -143,16 +143,19 @@ export default async function Home({ searchParams }: HomePageProps) {
                       <div className="min-w-0">
                         <p className="truncate text-lg font-semibold text-slate-950">
                           {surah.nameLatin}
+                          <span className="ml-1 text-sm font-normal text-slate-500">
+                            ({surah.meaning})
+                          </span>
                         </p>
-                        <p className="truncate text-sm text-slate-500">
-                          {surah.meaning} • {surah.verseCount} ayat
-                        </p>
+                        <div className="mt-0.5 flex items-center gap-2">
+                          {kind ? <RevelationBadge kind={kind} size="sm" /> : null}
+                          <span className="text-sm text-slate-500">{surah.verseCount} ayat</span>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="min-w-0 text-right">
                         <p className="font-arabic truncate text-3xl text-slate-950">
                           {surah.nameArabic}
                         </p>
-                        <RevelationBadge kind={kind} />
                       </div>
                     </div>
 
@@ -163,23 +166,19 @@ export default async function Home({ searchParams }: HomePageProps) {
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-base font-semibold text-slate-950">
                           {surah.nameLatin}
+                          <span className="ml-1 text-xs font-normal text-slate-500">
+                            ({surah.meaning})
+                          </span>
                         </p>
-                        <p className="truncate text-xs text-slate-500">
-                          {surah.meaning} • {surah.verseCount} ayat
-                        </p>
+                        <div className="mt-0.5 flex items-center gap-2">
+                          {kind ? <RevelationBadge kind={kind} size="sm" /> : null}
+                          <span className="text-xs text-slate-500">{surah.verseCount} ayat</span>
+                        </div>
                       </div>
-                      <div className="flex flex-[2] min-w-0 items-center gap-2">
-                        <p className="font-arabic flex-1 truncate text-right text-3xl text-slate-950">
+                      <div className="min-w-0">
+                        <p className="font-arabic truncate text-3xl text-slate-950">
                           {surah.nameArabic}
                         </p>
-                        {kind ? (
-                          <RevelationBadge kind={kind} size="sm" />
-                        ) : (
-                          <span className="invisible inline-flex shrink-0 items-center gap-0.5 rounded-full px-1.5 py-0 text-[8px] font-semibold uppercase tracking-[0.1em] ring-1">
-                            <span className="h-1 w-1 rounded-full" aria-hidden />
-                            Madaniyah
-                          </span>
-                        )}
                       </div>
                     </div>
                   </NavLink>
